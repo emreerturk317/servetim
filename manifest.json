@@ -2,6 +2,7 @@
   "name": "Servetim",
   "short_name": "Servetim",
   "description": "Kişisel birikim takip uygulaması",
+  "id": "/servetim/",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fafaf8",
