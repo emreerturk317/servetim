@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2d6a4f">
+  <meta name="description" content="Kişisel birikim takip uygulaması">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Servetim">
+  <title>Servetim</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SETUP WIZARD
+═══════════════════════════════════════════ -->
+<div id="setup-screen" class="hidden">
+  <div style="display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;">
+
+    <!-- Progress dots -->
+    <div style="padding:20px 24px 0;">
+      <div class="setup-progress">
+        <div class="setup-dot active" id="dot-1"></div>
+        <div class="setup-dot" id="dot-2"></div>
+        <div class="setup-dot" id="dot-3"></div>
+      </div>
+    </div>
+
+    <!-- Step 1: Language -->
+    <div class="setup-page" id="setup-step-1">
+      <div class="setup-emoji">💰</div>
+      <h1 class="setup-title step1-title">Hoş Geldin 👋</h1>
+      <p class="setup-desc step1-desc">Servetim ile tüm varlıklarını tek yerde takip et. Basit, güvenli, tamamen senin.</p>
+      <div class="lang-options">
+        <button class="lang-btn selected" data-lang="tr" onclick="setupSelectLang('tr')">
+          <span class="lang-flag">🇹🇷</span>Türkçe
+        </button>
+        <button class="lang-btn" data-lang="en" onclick="setupSelectLang('en')">
+          <span class="lang-flag">🇬🇧</span>English
+        </button>
+      </div>
+      <div class="setup-spacer"></div>
+      <button class="btn btn-primary btn-full" onclick="setupNext()">İleri →</button>
+    </div>
+
+    <!-- Step 2: Currency + Reminder -->
+    <div class="setup-page hidden" id="setup-step-2">
+      <div class="setup-emoji">💱</div>
+      <h1 class="setup-title">Ana Para Birimi</h1>
+      <p class="setup-desc">Uygulamada öncelikli hangi para birimini görmek istersin?</p>
+      <div class="currency-options">
+        <button class="curr-btn selected" data-cur="TRY" onclick="setupSelectCurrency('TRY')">🇹🇷 TL (₺)</button>
+        <button class="curr-btn" data-cur="USD" onclick="setupSelectCurrency('USD')">🇺🇸 USD ($)</button>
+        <button class="curr-btn" data-cur="EUR" onclick="setupSelectCurrency('EUR')">🇪🇺 EUR (€)</button>
+        <button class="curr-btn" data-cur="GBP" onclick="setupSelectCurrency('GBP')">🇬🇧 GBP (£)</button>
+      </div>
+      <p class="setup-desc" style="margin-top:0;margin-bottom:12px">📅 Hangi gün hatırlatayım?</p>
+      <div class="day-picker" id="day-picker">
+        <!-- filled by JS below -->
+      </div>
+      <div class="setup-spacer"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" onclick="setupBack()">← Geri</button>
+        <button class="btn btn-primary" style="flex:1" onclick="setupNext()">İleri →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Notifications -->
+    <div class="setup-page hidden" id="setup-step-3">
+      <div class="setup-emoji">🔔</div>
+      <h1 class="setup-title">Bildirimler</h1>
+      <p class="setup-desc">Her ay belirlediğin günde varlıklarını güncellemeyi hatırlatan bir bildirim göndereceğim.</p>
+      <div style="background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+        <div style="font-size:2rem;margin-bottom:8px;">📊</div>
+        <div style="font-weight:700;margin-bottom:4px;">Servetim</div>
+        <div style="font-size:13px;color:var(--text-muted);">Merhaba! Bu ay varlıklarını güncelleme zamanı 📊</div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="setupFinishWithNotif(true)" style="margin-bottom:10px">📲 Evet, izin veriyorum</button>
+      <button class="btn btn-secondary btn-full" onclick="setupFinishWithNotif(false)">Şimdilik hayır</button>
+      <div class="setup-spacer"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════ -->
+<div id="app-shell" class="hidden">
+  <div id="root">
+
+    <!-- Header -->
+    <header id="app-header">
+      <h1>Servetim</h1>
+      <div id="header-right">
+        <span id="rate-badge">$1 = ₺38.50</span>
+        <button id="header-update-btn" class="hidden" onclick="openUpdateModal()">📊 Güncelle</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main id="main-content">
+
+      <!-- ─── DASHBOARD ─── -->
+      <div id="page-dashboard" class="page hidden">
+
+        <!-- Net Worth Card -->
+        <div id="net-worth-card">
+          <div class="label">Toplam Net Servet</div>
+          <div id="net-worth-primary">₺0</div>
+          <div id="net-worth-secondary">$0</div>
+          <div id="net-worth-change" class="net-worth-change hidden"></div>
+        </div>
+
+        <!-- Gamification Strip -->
+        <div class="card" style="margin-bottom:14px">
+          <div id="gamification-card">
+            <div class="gamif-level">
+              <span class="level-icon" id="level-icon">🌱</span>
+              <div class="level-info">
+                <div class="level-label">Seviye</div>
+                <div class="level-name" id="level-name">Filiz</div>
+              </div>
+            </div>
+            <div class="gamif-divider"></div>
+            <div class="gamif-streak">
+              <span class="streak-icon">🔥</span>
+              <div class="streak-info">
+                <div class="streak-count"><span id="streak-count">0</span></div>
+                <div class="streak-label" id="streak-label">Aylık Seri</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut Chart -->
+        <div class="card hidden" id="donut-wrap" style="margin-bottom:14px;padding-top:16px">
+          <div style="text-align:center;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Varlık Dağılımı</div>
+          <div id="chart-container" style="width:160px;height:160px;margin:0 auto"><canvas id="donut-chart"></canvas></div>
+          <div id="donut-legend"></div>
+        </div>
+
+        <!-- Asset List -->
+        <div class="section-header">
+          <span class="section-title">Varlıklarım</span>
+        </div>
+        <div class="card" id="asset-list"></div>
+
+        <div style="height:80px"></div>
+      </div>
+
+      <!-- ─── HISTORY ─── -->
+      <div id="page-history" class="page hidden">
+        <div class="section-header" style="margin-top:4px"><span class="section-title">Servet Tarihçesi</span></div>
+
+        <div class="card hidden" id="history-no-chart" style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">
+          Grafik için en az 2 aylık veri gerekli
+        </div>
+
+        <div class="card hidden" id="history-chart-wrap" style="margin-bottom:12px;height:260px;padding:12px">
+          <canvas id="line-chart"></canvas>
+        </div>
+
+        <div class="card hidden" id="history-empty">
+          <div class="empty-state">
+            <div class="empty-icon">📈</div>
+            <div class="empty-title">Henüz kayıt yok</div>
+            <div class="empty-desc">Aylık güncelleme yapınca grafik ve tablo burada görünür.</div>
+          </div>
+        </div>
+
+        <div class="card hidden" id="history-table-wrap">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Ay</th>
+                <th>TL</th>
+                <th>USD</th>
+                <th>Değişim</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
+        <div style="height:80px"></div>
+      </div>
+
+      <!-- ─── SETTINGS ─── -->
+      <div id="page-settings" class="page hidden">
+        <div class="section-header" style="margin-top:4px">
+          <span class="section-title">Ayarlar</span>
+        </div>
+
+        <div class="settings-group-label">Görünüm</div>
+        <div class="card">
+          <div class="settings-row">
+            <div class="settings-row-label">Dil</div>
+            <div class="settings-btn-group">
+              <button class="settings-pill" data-lang="tr" onclick="settingsSelectLang('tr')">🇹🇷 TR</button>
+              <button class="settings-pill" data-lang="en" onclick="settingsSelectLang('en')">🇬🇧 EN</button>
+            </div>
+          </div>
+          <div class="settings-sep"></div>
+          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
+            <div class="settings-row-label">Ana Para Birimi</div>
+            <div class="settings-btn-group">
+              <button class="settings-pill" data-scur="TRY" onclick="settingsSelectCurrency('TRY')">₺ TRY</button>
+              <button class="settings-pill" data-scur="USD" onclick="settingsSelectCurrency('USD')">$ USD</button>
+              <button class="settings-pill" data-scur="EUR" onclick="settingsSelectCurrency('EUR')">€ EUR</button>
+              <button class="settings-pill" data-scur="GBP" onclick="settingsSelectCurrency('GBP')">£ GBP</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group-label">Bildirimler</div>
+        <div class="card">
+          <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+            <div class="settings-row-label">Hatırlatma Günü</div>
+            <div class="settings-row-sub">Her ayın kaçında hatırlatayım?</div>
+            <div id="settings-day-picker" class="settings-day-grid"></div>
+          </div>
+          <div class="settings-sep"></div>
+          <div class="settings-row" onclick="settingsToggleNotif()" style="cursor:pointer">
+            <div class="settings-row-label">Bildirimleri Etkinleştir</div>
+            <div class="settings-switch" id="settings-notif-switch">
+              <div class="settings-switch-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-full" style="margin-top:16px" onclick="saveSettingsPage()">Kaydet</button>
+
+        <div class="settings-group-label" style="margin-top:24px">Veri</div>
+        <div class="card">
+          <div class="settings-row" onclick="resetAllData()" style="cursor:pointer">
+            <div class="settings-row-label" style="color:var(--danger)">Tüm Verileri Sıfırla</div>
+            <span style="color:var(--danger);font-size:20px">›</span>
+          </div>
+        </div>
+
+        <div style="height:80px"></div>
+      </div>
+
+      <!-- ─── GOALS ─── -->
+      <div id="page-goals" class="page hidden">
+        <div class="section-header" style="margin-top:4px"><span class="section-title">Hedeflerim</span></div>
+        <div id="goals-list"></div>
+
+        <div class="section-header" style="margin-top:18px"><span class="section-title">Rozetler</span></div>
+        <div class="card" id="badges-container"></div>
+
+        <div style="height:80px"></div>
+      </div>
+
+    </main>
+
+    <!-- FAB -->
+    <button id="fab" onclick="onFabClick()">+</button>
+
+    <!-- Bottom Nav -->
+    <nav id="bottom-nav">
+      <button class="nav-item" id="nav-dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Özet</span>
+      </button>
+      <button class="nav-item" id="nav-history" onclick="navigate('history')">
+        <span class="nav-icon">📈</span>
+        <span class="nav-label">Grafik</span>
+      </button>
+      <button class="nav-item" id="nav-goals" onclick="navigate('goals')">
+        <span class="nav-icon">🎯</span>
+        <span class="nav-label">Hedefler</span>
+      </button>
+      <button class="nav-item" id="nav-settings" onclick="navigate('settings')">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Ayarlar</span>
+      </button>
+    </nav>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: ADD / EDIT ASSET
+═══════════════════════════════════════════ -->
+<div id="modal-asset" class="modal-overlay hidden" onclick="if(event.target===this)closeAssetModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Yeni Varlık</span>
+      <button class="modal-close" onclick="closeAssetModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Category -->
+      <div class="form-group">
+        <label class="form-label">Kategori</label>
+        <div class="category-grid" id="asset-cat-grid"></div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label class="form-label">Varlık Adı *</label>
+        <input id="asset-name-input" class="form-input" type="text" placeholder="Yapı Kredi, Gram Altın, Arsa..." maxlength="60">
+      </div>
+
+      <!-- Amount + Currency -->
+      <div class="form-group">
+        <label class="form-label">Değer *</label>
+        <input id="asset-amount-input" class="form-input" type="number" placeholder="0" min="0" step="any" inputmode="decimal">
+        <div class="currency-toggle" style="margin-top:8px">
+          <button class="currency-btn selected" data-cur="TRY" onclick="selectCurrency('TRY')">₺ TL</button>
+          <button class="currency-btn" data-cur="USD" onclick="selectCurrency('USD')">$ USD</button>
+        </div>
+      </div>
+
+      <!-- Note -->
+      <div class="form-group">
+        <label class="form-label">Not</label>
+        <textarea id="asset-note-input" class="form-textarea" placeholder="Miktar, detay, hatırlatma..." maxlength="200"></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button id="asset-delete-btn" class="btn btn-danger hidden" onclick="deleteAsset()">🗑️</button>
+      <button class="btn btn-secondary" onclick="closeAssetModal()">İptal</button>
+      <button class="btn btn-primary" onclick="saveAsset()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: ADD / EDIT GOAL
+═══════════════════════════════════════════ -->
+<div id="modal-goal" class="modal-overlay hidden" onclick="if(event.target===this)closeGoalModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">Yeni Hedef</span>
+      <button class="modal-close" onclick="closeGoalModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-group">
+        <label class="form-label">Hedef Adı *</label>
+        <input id="goal-name-input" class="form-input" type="text" placeholder="Tatil Evi, Araba, Emeklilik..." maxlength="60">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hedef Tutarı *</label>
+        <input id="goal-amount-input" class="form-input" type="number" placeholder="0" min="0" step="any" inputmode="decimal">
+        <div class="currency-toggle" style="margin-top:8px">
+          <button class="goal-currency-btn currency-btn" data-cur="TRY" onclick="selectGoalCurrency('TRY')">₺ TL</button>
+          <button class="goal-currency-btn currency-btn selected" data-cur="USD" onclick="selectGoalCurrency('USD')">$ USD</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Hedef Tarihi (opsiyonel)</label>
+        <input id="goal-date-input" class="form-input" type="date">
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button id="goal-delete-btn" class="btn btn-danger hidden" onclick="deleteGoal(editingGoalId)">🗑️</button>
+      <button class="btn btn-secondary" onclick="closeGoalModal()">İptal</button>
+      <button class="btn btn-primary" onclick="saveGoal()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL: MONTHLY UPDATE
+═══════════════════════════════════════════ -->
+<div id="modal-update" class="modal-overlay hidden" onclick="if(event.target===this)closeUpdateModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">📊 Aylık Güncelleme</span>
+      <button class="modal-close" onclick="closeUpdateModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+        Bu ayki varlık değerlerini gir. Gayrimenkuller geçen ayın değeriyle hazır geliyor.
+      </p>
+      <div id="update-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeUpdateModal()">İptal</button>
+      <button class="btn btn-primary" onclick="saveUpdate()">Güncellemeyi Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BADGE POPUP
+═══════════════════════════════════════════ -->
+<div id="badge-popup" class="hidden" onclick="closeBadgePopup()">
+  <div class="badge-popup-card" onclick="event.stopPropagation()">
+    <div class="badge-popup-emoji" id="badge-popup-emoji">🏆</div>
+    <h2 class="badge-popup-title" id="badge-popup-title">Yeni Rozet!</h2>
+    <div class="badge-popup-name" id="badge-popup-name"></div>
+    <div class="badge-popup-desc" id="badge-popup-desc"></div>
+    <button class="btn btn-primary btn-full" onclick="closeBadgePopup()">Harika! 🎉</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="hidden"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+  // Fill day picker (1–28) in setup
+  const dp = document.getElementById('day-picker');
+  for (let d = 1; d <= 28; d++) {
+    dp.innerHTML += `<button class="day-btn ${d===1?'selected':''}" data-day="${d}" onclick="setupSelectDay(${d})">${d}</button>`;
+  }
+</script>
+
+</body>
+</html>

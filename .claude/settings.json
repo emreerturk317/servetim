@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(d:/Servetim Uygulamasi/**)",
+      "Write(d:/Servetim Uygulamasi/**)"
+    ]
+  }
+}
