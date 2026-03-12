@@ -30,6 +30,7 @@ async function init() {
     hideSetup();
     renderApp();
     checkMonthlyUpdatePrompt();
+    tryShowReminderNotification();
   }
 
   // Service worker
@@ -444,6 +445,28 @@ function checkMonthlyUpdatePrompt() {
   } else {
     btn.classList.add('hidden');
   }
+}
+
+function tryShowReminderNotification() {
+  const settings = Storage.getSettings();
+  if (!settings.notificationsEnabled) return;
+  if (Notification.permission !== 'granted') return;
+  if (Storage.hasCurrentMonthEntry()) return;
+  if (!Storage.getAssets().length) return;
+  const now = new Date();
+  if (now.getDate() < settings.reminderDay) return;
+
+  // Only show once per day
+  const lastNotifDay = localStorage.getItem('srv_last_notif_day');
+  const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  if (lastNotifDay === todayKey) return;
+  localStorage.setItem('srv_last_notif_day', todayKey);
+
+  new Notification('Servetim 📊', {
+    body: 'Varlıklarını güncelleme zamanı! Bu ayın kaydını almayı unutma.',
+    icon: '/servetim/icons/icon-192.png',
+    badge: '/servetim/icons/icon-192.png',
+  });
 }
 
 function openUpdateModal() {

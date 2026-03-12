@@ -1,4 +1,4 @@
-const CACHE_NAME = 'servetim-v6';
+const CACHE_NAME = 'servetim-v7';
 const ASSETS = [
   './',
   './index.html',
