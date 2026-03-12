@@ -422,12 +422,17 @@ function deleteAsset() {
 // ─── Monthly Update ───────────────────────────────────
 function checkMonthlyUpdatePrompt() {
   if (Storage.hasCurrentMonthEntry()) return;
+  const assets = Storage.getAssets();
+  if (!assets.length) return;
   const history = Storage.getHistory();
-  if (!history.length) return; // First time: no prompt, user just adds assets normally
+  if (!history.length) {
+    // First time: always show button so user can record first snapshot
+    document.getElementById('header-update-btn').classList.remove('hidden');
+    return;
+  }
   const settings = Storage.getSettings();
   const now = new Date();
   if (now.getDate() >= settings.reminderDay) {
-    // Show subtle reminder in header
     document.getElementById('header-update-btn').classList.remove('hidden');
   }
 }
