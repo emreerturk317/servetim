@@ -421,38 +421,50 @@ function deleteAsset() {
 
 // ─── Monthly Update ───────────────────────────────────
 function checkMonthlyUpdatePrompt() {
-  if (Storage.hasCurrentMonthEntry()) return;
   const assets = Storage.getAssets();
-  if (!assets.length) return;
+  const btn = document.getElementById('header-update-btn');
+  if (!assets.length) { btn.classList.add('hidden'); return; }
+  if (Storage.hasCurrentMonthEntry()) {
+    btn.textContent = '✏️ Düzenle';
+    btn.classList.remove('hidden');
+    return;
+  }
   const history = Storage.getHistory();
   if (!history.length) {
-    // First time: always show button so user can record first snapshot
-    document.getElementById('header-update-btn').classList.remove('hidden');
+    btn.textContent = '📊 Güncelle';
+    btn.classList.remove('hidden');
     return;
   }
   const settings = Storage.getSettings();
   const now = new Date();
   if (now.getDate() >= settings.reminderDay) {
-    document.getElementById('header-update-btn').classList.remove('hidden');
+    btn.textContent = '📊 Güncelle';
+    btn.classList.remove('hidden');
+  } else {
+    btn.classList.add('hidden');
   }
 }
 
 function openUpdateModal() {
-  if (Storage.hasCurrentMonthEntry()) { showToast(i18n.t('alreadyUpdated')); return; }
   const assets = Storage.getAssets();
   if (!assets.length) { showToast(i18n.t('noAssets')); return; }
+  const isEdit = Storage.hasCurrentMonthEntry();
   const history = Storage.getHistory().sort((a, b) => a.monthKey > b.monthKey ? 1 : -1);
-  const prevSnap = history.length ? history[history.length - 1].snapshot : null;
-  const prevMap = {};
-  if (prevSnap) prevSnap.forEach(a => prevMap[a.id] = a);
+  // Edit: pre-fill with current month's snapshot; New: pre-fill with previous month's snapshot
+  const refSnap = history.length ? history[history.length - 1].snapshot : null;
+  const refMap = {};
+  if (refSnap) refSnap.forEach(a => refMap[a.id] = a);
 
   const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
   const modal = document.getElementById('modal-update');
   const body = document.getElementById('update-list');
 
+  modal.querySelector('.modal-title').textContent = isEdit ? '✏️ Güncellemeyi Düzenle' : '📊 Aylık Güncelleme';
+  document.getElementById('update-edit-note').style.display = isEdit ? 'block' : 'none';
+
   body.innerHTML = assets.map(asset => {
-    const prevAsset = prevMap[asset.id];
-    const displayVal = prevAsset ? prevAsset.amount : asset.amount;
+    const refAsset = refMap[asset.id];
+    const displayVal = refAsset ? refAsset.amount : asset.amount;
     const cur = asset.currency;
     return `<div class="update-asset-row">
       <span class="update-asset-icon">${emojis[asset.category]}</span>
@@ -494,12 +506,14 @@ function saveUpdate() {
   const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency), 0);
   const history = Storage.getHistory();
   const monthKey = Storage.currentMonthKey();
-  history.push({ monthKey, date: today(), totalTRY, totalUSD, usdTryRate: USD_TRY, snapshot: JSON.parse(JSON.stringify(assets)) });
+  const entry = { monthKey, date: today(), totalTRY, totalUSD, usdTryRate: USD_TRY, snapshot: JSON.parse(JSON.stringify(assets)) };
+  const existingIdx = history.findIndex(h => h.monthKey === monthKey);
+  if (existingIdx >= 0) { history[existingIdx] = entry; } else { history.push(entry); }
   Storage.saveHistory(history);
 
   checkGamification();
   closeUpdateModal();
-  document.getElementById('header-update-btn').classList.add('hidden');
+  checkMonthlyUpdatePrompt();
   renderDashboard();
   showToast(i18n.t('updateSaved'));
 }
@@ -596,31 +610,66 @@ function renderHistory() {
     document.getElementById('history-no-chart').classList.remove('hidden');
   }
 
-  // Table
-  const table = document.getElementById('history-table-body');
+  // Month cards
+  const cardsContainer = document.getElementById('history-cards');
   if (!history.length) {
     document.getElementById('history-empty').classList.remove('hidden');
-    document.getElementById('history-table-wrap').classList.add('hidden');
+    cardsContainer.innerHTML = '';
     return;
   }
   document.getElementById('history-empty').classList.add('hidden');
-  document.getElementById('history-table-wrap').classList.remove('hidden');
+
+  const currentMonthKey = Storage.currentMonthKey();
+  const monthsFull = i18n.t('monthsFull');
+  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property') };
+  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
+
+  function fullMonthLabel(mk) {
+    const [y, m] = mk.split('-');
+    return `${monthsFull[+m - 1]} ${y}`;
+  }
 
   const reversed = [...history].reverse();
-  table.innerHTML = reversed.map((h, i) => {
+  cardsContainer.innerHTML = reversed.map((h, i) => {
     const prev = reversed[i + 1];
-    let changeHtml = '—';
+    const isCurrentMonth = h.monthKey === currentMonthKey;
+
+    let changeHtml = '';
     if (prev) {
+      const diffTRY = h.totalTRY - prev.totalTRY;
       const pct = ((h.totalUSD - prev.totalUSD) / (prev.totalUSD || 1)) * 100;
-      const cls = pct >= 0 ? 'change-up' : 'change-down';
-      changeHtml = `<span class="${cls}">${pct >= 0 ? '▲' : '▼'} ${Math.abs(pct).toFixed(1)}%</span>`;
+      const up = diffTRY >= 0;
+      const sign = up ? '+' : '';
+      changeHtml = `<div class="hmc-change-row"><span class="hmc-change ${up ? 'positive' : 'negative'}">${up ? '▲' : '▼'} ${sign}${fmtTRY(diffTRY)} (${sign}${pct.toFixed(1)}%)</span></div>`;
     }
-    return `<tr>
-      <td>${monthLabel(h.monthKey)}</td>
-      <td>${fmtTRY(h.totalTRY)}</td>
-      <td>${fmtUSD(h.totalUSD)}</td>
-      <td>${changeHtml}</td>
-    </tr>`;
+
+    const cats = {};
+    (h.snapshot || []).forEach(a => {
+      if (!cats[a.category]) cats[a.category] = 0;
+      cats[a.category] += toTRY(a.amount, a.currency);
+    });
+    const catRows = Object.entries(cats)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, val]) => `<div class="hmc-asset-row"><span>${emojis[cat]} ${catNames[cat]}</span><span>${fmtTRY(val)}</span></div>`)
+      .join('');
+
+    const rateStr = h.usdTryRate ? `$1 = ₺${h.usdTryRate.toFixed(2)}` : '';
+    const metaStr = [rateStr, h.date].filter(Boolean).join(' · ');
+
+    return `<div class="card hmc${isCurrentMonth ? ' hmc-current' : ''}">
+      <div class="hmc-header">
+        <span class="hmc-month-name">${fullMonthLabel(h.monthKey)}</span>
+        ${isCurrentMonth ? `<button class="hmc-edit-btn" onclick="openUpdateModal()">✏️ Düzenle</button>` : ''}
+      </div>
+      <div class="hmc-totals">
+        <span class="hmc-total-try">${fmtTRY(h.totalTRY)}</span>
+        <span class="hmc-total-usd">${fmtUSD(h.totalUSD)}</span>
+      </div>
+      ${changeHtml}
+      <div class="hmc-divider"></div>
+      <div class="hmc-assets">${catRows}</div>
+      ${metaStr ? `<div class="hmc-meta">${metaStr}</div>` : ''}
+    </div>`;
   }).join('');
 }
 

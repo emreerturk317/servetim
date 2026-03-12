@@ -173,23 +173,11 @@
           <div class="empty-state">
             <div class="empty-icon">📈</div>
             <div class="empty-title">Henüz kayıt yok</div>
-            <div class="empty-desc">Aylık güncelleme yapınca grafik ve tablo burada görünür.</div>
+            <div class="empty-desc">Aylık güncelleme yapınca grafik ve kartlar burada görünür.</div>
           </div>
         </div>
 
-        <div class="card hidden" id="history-table-wrap">
-          <table class="history-table">
-            <thead>
-              <tr>
-                <th>Ay</th>
-                <th>TL</th>
-                <th>USD</th>
-                <th>Değişim</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body"></tbody>
-          </table>
-        </div>
+        <div id="history-cards"></div>
         <div style="height:80px"></div>
       </div>
 
@@ -391,6 +379,9 @@
       <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
         Bu ayki varlık değerlerini gir. Gayrimenkuller geçen ayın değeriyle hazır geliyor.
       </p>
+      <div id="update-edit-note" style="display:none;font-size:12px;background:var(--primary-pale);color:var(--primary);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-weight:600">
+        ℹ️ Bu ayı daha önce güncelledin. Değişiklikler üzerine yazılacak.
+      </div>
       <div id="update-list"></div>
     </div>
     <div class="modal-footer">

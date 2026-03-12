@@ -420,6 +420,24 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 
+/* ===== HISTORY MONTH CARDS ===== */
+.hmc { margin-bottom: 10px; }
+.hmc-current { border-left: 3px solid var(--primary); }
+.hmc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.hmc-month-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); }
+.hmc-edit-btn { font-size: 12px; padding: 4px 10px; border-radius: 12px; background: var(--surface2); color: var(--primary); font-weight: 700; cursor: pointer; border: none; }
+.hmc-totals { margin-bottom: 2px; }
+.hmc-total-try { font-size: 22px; font-weight: 800; color: var(--text); display: block; }
+.hmc-total-usd { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.hmc-change-row { margin: 4px 0 0; }
+.hmc-change { font-size: 13px; font-weight: 700; }
+.hmc-change.positive { color: var(--success); }
+.hmc-change.negative { color: var(--danger); }
+.hmc-divider { height: 1px; background: var(--border); margin: 10px 0 8px; }
+.hmc-assets { display: flex; flex-direction: column; gap: 5px; }
+.hmc-asset-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text); }
+.hmc-meta { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
+
 /* ===== SETTINGS PAGE ===== */
 .settings-group-label {
   font-size: 11px; font-weight: 700; color: var(--text-muted);

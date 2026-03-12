@@ -101,6 +101,7 @@ const i18n = {
       noHistoryChart: 'Grafik için en az 2 aylık veri gerekli',
       month: 'Ay', tryVal: 'TL Servet', usdVal: 'USD Servet', change: 'Değişim',
       monthsShort: ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'],
+      monthsFull: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
 
       // Toast
       assetSaved: '✓ Varlık kaydedildi',
@@ -202,6 +203,7 @@ const i18n = {
       noHistoryChart: 'At least 2 months of data needed for the chart',
       month: 'Month', tryVal: 'TRY Net Worth', usdVal: 'USD Net Worth', change: 'Change',
       monthsShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      monthsFull: ['January','February','March','April','May','June','July','August','September','October','November','December'],
 
       assetSaved: '✓ Asset saved',
       assetDeleted: '✓ Asset deleted',
