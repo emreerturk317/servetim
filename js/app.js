@@ -187,6 +187,7 @@ function fmtNum(n) {
 
 // ─── Dashboard ────────────────────────────────────────
 function renderDashboard() {
+  checkMonthlyUpdatePrompt();
   const assets = Storage.getAssets();
   const history = Storage.getHistory().sort((a, b) => a.monthKey > b.monthKey ? 1 : -1);
   const gamif = Storage.getGamification();
