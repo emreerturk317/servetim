@@ -50,7 +50,7 @@ const i18n = {
 
       // Asset form
       assetName: 'Varlık Adı',
-      assetNamePlaceholder: 'Yapı Kredi, Gram Altın, Arsa...',
+      assetNamePlaceholder: 'Banka Hesabı, Gram Altın, Arsa...',
       category: 'Kategori',
       amount: 'Değer',
       currency: 'Para Birimi',
