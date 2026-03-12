@@ -930,6 +930,51 @@ function resetAllData() {
   location.reload();
 }
 
+function exportData() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    settings:     Storage.getSettings(),
+    assets:       Storage.getAssets(),
+    history:      Storage.getHistory(),
+    goals:        Storage.getGoals(),
+    gamification: Storage.getGamification(),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `servetim-yedek-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Yedek dosyası indirildi');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.assets || !data.settings) { showToast('Geçersiz yedek dosyası'); return; }
+      if (!confirm('Mevcut tüm veriler bu yedekle değiştirilecek. Devam et?')) return;
+      Storage.saveSettings(data.settings);
+      Storage.saveAssets(data.assets);
+      Storage.saveHistory(data.history || []);
+      Storage.saveGoals(data.goals || []);
+      if (data.gamification) Storage.saveGamification(data.gamification);
+      localStorage.setItem(Storage.K.INIT, 'true');
+      showToast('✓ Veriler geri yüklendi!');
+      setTimeout(() => location.reload(), 1000);
+    } catch {
+      showToast('Dosya okunamadı');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 // ─── Confetti ─────────────────────────────────────────
 function launchConfetti() {
   const colors = ['#2d6a4f','#52b788','#b5860d','#f7931a','#7c3aed','#1a5276','#fbbf24'];

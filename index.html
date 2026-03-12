@@ -228,6 +228,23 @@
 
         <div class="settings-group-label" style="margin-top:24px">Veri</div>
         <div class="card">
+          <div class="settings-row" onclick="exportData()" style="cursor:pointer">
+            <div>
+              <div class="settings-row-label">Veriyi Dışa Aktar</div>
+              <div class="settings-row-sub">Tüm verilerini JSON dosyasına kaydet</div>
+            </div>
+            <span style="font-size:20px">⬇️</span>
+          </div>
+          <div class="settings-sep"></div>
+          <div class="settings-row" onclick="document.getElementById('import-file-input').click()" style="cursor:pointer">
+            <div>
+              <div class="settings-row-label">Veriyi İçe Aktar</div>
+              <div class="settings-row-sub">Daha önce aldığın yedeği geri yükle</div>
+            </div>
+            <span style="font-size:20px">⬆️</span>
+          </div>
+          <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="importData(event)">
+          <div class="settings-sep"></div>
           <div class="settings-row" onclick="resetAllData()" style="cursor:pointer">
             <div class="settings-row-label" style="color:var(--danger)">Tüm Verileri Sıfırla</div>
             <span style="color:var(--danger);font-size:20px">›</span>
