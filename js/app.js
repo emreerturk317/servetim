@@ -576,12 +576,30 @@ function renderHistory() {
 
   // Chart
   const chartWrap = document.getElementById('history-chart-wrap');
-  if (history.length >= 2) {
+  if (history.length >= 1) {
     chartWrap.classList.remove('hidden');
     document.getElementById('history-no-chart').classList.add('hidden');
     const labels = history.map(h => monthLabel(h.monthKey));
     const tryData = history.map(h => h.totalTRY);
     const usdData = history.map(h => h.totalUSD);
+
+    // Goal datasets: horizontal dashed lines on TRY axis
+    const goalColors = ['#7c3aed', '#1a5276', '#b5860d', '#dc2626'];
+    const goals = Storage.getGoals().filter(g => g.targetAmount);
+    const goalDatasets = goals.slice(0, 4).map((g, i) => {
+      const targetTRY = g.targetCurrency === 'USD' ? g.targetAmount * USD_TRY : g.targetAmount;
+      return {
+        label: g.name,
+        data: labels.map(() => targetTRY),
+        borderColor: goalColors[i % goalColors.length],
+        borderDash: [6, 4],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false,
+        yAxisID: 'yTRY',
+        tension: 0
+      };
+    });
 
     const ctx = document.getElementById('line-chart').getContext('2d');
     if (lineChart) lineChart.destroy();
@@ -590,14 +608,18 @@ function renderHistory() {
       data: {
         labels,
         datasets: [
-          { label: 'TL', data: tryData, borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,.08)', tension: .35, fill: true, yAxisID: 'yTRY', pointBackgroundColor: '#2d6a4f', pointRadius: 4 },
-          { label: 'USD', data: usdData, borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,.06)', tension: .35, fill: false, yAxisID: 'yUSD', pointBackgroundColor: '#f7931a', pointRadius: 4 }
+          { label: 'TL', data: tryData, borderColor: '#2d6a4f', backgroundColor: 'rgba(45,106,79,.08)', tension: .35, fill: true, yAxisID: 'yTRY', pointBackgroundColor: '#2d6a4f', pointRadius: history.length === 1 ? 6 : 4 },
+          { label: 'USD', data: usdData, borderColor: '#f7931a', backgroundColor: 'rgba(247,147,26,.06)', tension: .35, fill: false, yAxisID: 'yUSD', pointBackgroundColor: '#f7931a', pointRadius: history.length === 1 ? 6 : 4 },
+          ...goalDatasets
         ]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16, font: { family: 'Nunito', weight: '600', size: 12 } } },
-          tooltip: { callbacks: { label: ctx => ctx.datasetIndex === 0 ? fmtTRY(ctx.raw) : fmtUSD(ctx.raw) } } },
+        plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, font: { family: 'Nunito', weight: '600', size: 11 } } },
+          tooltip: { callbacks: { label: ctx => {
+            if (ctx.dataset.yAxisID === 'yUSD') return fmtUSD(ctx.raw);
+            return fmtTRY(ctx.raw);
+          } } } },
         scales: {
           x: { grid: { display: false }, ticks: { font: { family: 'Nunito', size: 11 } } },
           yTRY: { position: 'left', grid: { color: '#f0f0f0' }, ticks: { font: { family: 'Nunito', size: 10 }, callback: v => '₺' + fmtNum(v) } },
