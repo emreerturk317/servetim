@@ -469,32 +469,53 @@ function tryShowReminderNotification() {
   });
 }
 
-function openUpdateModal() {
+let _editingMonthKey = null; // null = current month, string = past month key
+
+function openUpdateModal(monthKey) {
   const assets = Storage.getAssets();
-  if (!assets.length) { showToast(i18n.t('noAssets')); return; }
-  const isEdit = Storage.hasCurrentMonthEntry();
   const history = Storage.getHistory().sort((a, b) => a.monthKey > b.monthKey ? 1 : -1);
-  // Edit: pre-fill with current month's snapshot; New: pre-fill with previous month's snapshot
-  const refSnap = history.length ? history[history.length - 1].snapshot : null;
-  const refMap = {};
-  if (refSnap) refSnap.forEach(a => refMap[a.id] = a);
+  const currentMonthKey = Storage.currentMonthKey();
+  const isPastEdit = monthKey && monthKey !== currentMonthKey;
+  _editingMonthKey = isPastEdit ? monthKey : null;
 
   const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
   const modal = document.getElementById('modal-update');
   const body = document.getElementById('update-list');
 
-  modal.querySelector('.modal-title').textContent = isEdit ? '✏️ Güncellemeyi Düzenle' : '📊 Aylık Güncelleme';
-  document.getElementById('update-edit-note').style.display = isEdit ? 'block' : 'none';
+  let rowAssets, title;
+  if (isPastEdit) {
+    // Geçmiş ay düzenleme: o ayın snapshot'ından besle
+    const entry = history.find(h => h.monthKey === monthKey);
+    if (!entry) return;
+    const monthsFull = i18n.t('monthsFull');
+    const [y, m] = monthKey.split('-');
+    title = `✏️ ${monthsFull[+m - 1]} ${y}`;
+    rowAssets = (entry.snapshot || []).map(sa => ({ ...sa }));
+  } else {
+    // Cari ay: yeni kayıt veya cari ay düzenleme
+    if (!assets.length) { showToast(i18n.t('noAssets')); return; }
+    const isEdit = Storage.hasCurrentMonthEntry();
+    title = isEdit ? '✏️ Güncellemeyi Düzenle' : '📊 Aylık Güncelleme';
+    const refSnap = history.length ? history[history.length - 1].snapshot : null;
+    const refMap = {};
+    if (refSnap) refSnap.forEach(a => refMap[a.id] = a);
+    rowAssets = assets.map(asset => {
+      const ref = refMap[asset.id];
+      return { ...asset, amount: ref ? ref.amount : asset.amount };
+    });
+    document.getElementById('update-edit-note').style.display = isEdit ? 'block' : 'none';
+  }
 
-  body.innerHTML = assets.map(asset => {
-    const refAsset = refMap[asset.id];
-    const displayVal = refAsset ? refAsset.amount : asset.amount;
+  modal.querySelector('.modal-title').textContent = title;
+  if (isPastEdit) document.getElementById('update-edit-note').style.display = 'block';
+
+  body.innerHTML = rowAssets.map(asset => {
     const cur = asset.currency;
     return `<div class="update-asset-row">
       <span class="update-asset-icon">${emojis[asset.category]}</span>
       <span class="update-asset-name">${esc(asset.name)}</span>
       <input class="update-asset-input" type="number" data-id="${asset.id}" data-currency="${cur}"
-        value="${displayVal}" inputmode="decimal" min="0" step="any">
+        value="${asset.amount}" inputmode="decimal" min="0" step="any">
       <span class="update-currency-label">${cur === 'USD' ? '$' : '₺'}</span>
     </div>`;
   }).join('');
@@ -507,7 +528,6 @@ function closeUpdateModal() {
 }
 
 function saveUpdate() {
-  const assets = Storage.getAssets();
   const inputs = document.querySelectorAll('.update-asset-input');
   let valid = true;
   inputs.forEach(inp => {
@@ -517,24 +537,40 @@ function saveUpdate() {
   });
   if (!valid) { showToast(i18n.t('invalidAmount')); return; }
 
-  inputs.forEach(inp => {
-    const id = inp.dataset.id;
-    const val = parseFloat(inp.value.replace(',', '.'));
-    const asset = assets.find(a => a.id === id);
-    if (asset) asset.amount = val;
-  });
-  Storage.saveAssets(assets);
-
-  // Save history snapshot
-  const totalTRY = assets.reduce((s, a) => s + toTRY(a.amount, a.currency), 0);
-  const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency), 0);
   const history = Storage.getHistory();
-  const monthKey = Storage.currentMonthKey();
-  const entry = { monthKey, date: today(), totalTRY, totalUSD, usdTryRate: USD_TRY, snapshot: JSON.parse(JSON.stringify(assets)) };
-  const existingIdx = history.findIndex(h => h.monthKey === monthKey);
-  if (existingIdx >= 0) { history[existingIdx] = entry; } else { history.push(entry); }
-  Storage.saveHistory(history);
 
+  if (_editingMonthKey) {
+    // Geçmiş ay düzenleme: sadece history güncelle, mevcut varlıklara dokunma
+    const idx = history.findIndex(h => h.monthKey === _editingMonthKey);
+    if (idx < 0) return;
+    const existing = history[idx];
+    const snapshot = JSON.parse(JSON.stringify(existing.snapshot || []));
+    inputs.forEach(inp => {
+      const sa = snapshot.find(a => a.id === inp.dataset.id);
+      if (sa) sa.amount = parseFloat(inp.value.replace(',', '.'));
+    });
+    const totalTRY = snapshot.reduce((s, a) => s + toTRY(a.amount, a.currency), 0);
+    const totalUSD = snapshot.reduce((s, a) => s + toUSD(a.amount, a.currency), 0);
+    history[idx] = { ...existing, totalTRY, totalUSD, snapshot };
+    Storage.saveHistory(history);
+  } else {
+    // Cari ay güncellemesi: hem assets hem history kaydet
+    const assets = Storage.getAssets();
+    inputs.forEach(inp => {
+      const asset = assets.find(a => a.id === inp.dataset.id);
+      if (asset) asset.amount = parseFloat(inp.value.replace(',', '.'));
+    });
+    Storage.saveAssets(assets);
+    const totalTRY = assets.reduce((s, a) => s + toTRY(a.amount, a.currency), 0);
+    const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency), 0);
+    const monthKey = Storage.currentMonthKey();
+    const entry = { monthKey, date: today(), totalTRY, totalUSD, usdTryRate: USD_TRY, snapshot: JSON.parse(JSON.stringify(assets)) };
+    const existingIdx = history.findIndex(h => h.monthKey === monthKey);
+    if (existingIdx >= 0) { history[existingIdx] = entry; } else { history.push(entry); }
+    Storage.saveHistory(history);
+  }
+
+  _editingMonthKey = null;
   checkGamification();
   closeUpdateModal();
   checkMonthlyUpdatePrompt();
@@ -698,7 +734,7 @@ function renderHistory() {
     return `<div class="card hmc${isCurrentMonth ? ' hmc-current' : ''}">
       <div class="hmc-header">
         <span class="hmc-month-name">${fullMonthLabel(h.monthKey)}</span>
-        ${isCurrentMonth ? `<button class="hmc-edit-btn" onclick="openUpdateModal()">✏️ Düzenle</button>` : ''}
+        <button class="hmc-edit-btn" onclick="openUpdateModal('${h.monthKey}')">✏️ Düzenle</button>
       </div>
       <div class="hmc-totals">
         <span class="hmc-total-try">${fmtTRY(h.totalTRY)}</span>
