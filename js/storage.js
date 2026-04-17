@@ -1,12 +1,14 @@
 const Storage = {
   K: {
-    INIT:   'srv_initialized',
-    SETTINGS: 'srv_settings',
-    ASSETS:   'srv_assets',
-    HISTORY:  'srv_history',
-    GOALS:    'srv_goals',
-    EXCHANGE: 'srv_exchange',
-    GAMIF:    'srv_gamification',
+    INIT:        'srv_initialized',
+    SETTINGS:    'srv_settings',
+    ASSETS:      'srv_assets',
+    HISTORY:     'srv_history',
+    GOALS:       'srv_goals',
+    EXCHANGE:    'srv_exchange',
+    GAMIF:       'srv_gamification',
+    FROZEN_RATE: 'srv_frozen_rate',
+    LAST_SAVE:   'srv_last_save',
   },
 
   _get(key, fallback) {
@@ -35,6 +37,12 @@ const Storage = {
 
   getExchangeRate() { return this._get(this.K.EXCHANGE, null); },
   saveExchangeRate(d) { this._set(this.K.EXCHANGE, d); },
+
+  getFrozenRate() { return this._get(this.K.FROZEN_RATE, 38.5); },
+  saveFrozenRate(rate) { this._set(this.K.FROZEN_RATE, rate); },
+
+  getLastSave() { return this._get(this.K.LAST_SAVE, null); },
+  saveLastSave(date) { this._set(this.K.LAST_SAVE, date); },
 
   getGamification() {
     return { badges: [], level: 1, streak: 0, lastUpdateMonth: null,

@@ -4,6 +4,7 @@
 
 // ─── State ───────────────────────────────────────────
 let USD_TRY = 38.5;
+let frozenRate = 38.5;
 let rateInfo = {};
 let donutChart = null;
 let lineChart = null;
@@ -15,6 +16,9 @@ async function init() {
   // Load settings & apply language
   const settings = Storage.getSettings();
   i18n.setLanguage(settings.language);
+
+  // Load frozen rate from storage
+  frozenRate = Storage.getFrozenRate();
 
   // Fetch exchange rate in background (non-blocking)
   API.getUsdTryRate().then(r => {
@@ -182,11 +186,11 @@ function updateRateBadge() {
 }
 
 // ─── Conversions ──────────────────────────────────────
-function toTRY(amount, currency) {
-  return currency === 'USD' ? amount * USD_TRY : amount;
+function toTRY(amount, currency, rate = USD_TRY) {
+  return currency === 'USD' ? amount * rate : amount;
 }
-function toUSD(amount, currency) {
-  return currency === 'USD' ? amount : amount / USD_TRY;
+function toUSD(amount, currency, rate = USD_TRY) {
+  return currency === 'USD' ? amount : amount / rate;
 }
 function fmtTRY(n) {
   return '₺' + Math.round(n).toLocaleString('tr-TR');
@@ -208,9 +212,16 @@ function renderDashboard() {
   const gamif = Storage.getGamification();
   const settings = Storage.getSettings();
 
-  // Totals
-  const totalTRY = assets.reduce((s, a) => s + toTRY(a.amount, a.currency), 0);
-  const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency), 0);
+  // Totals (dondurulmuş kur ile hesapla)
+  const totalTRY = assets.reduce((s, a) => s + toTRY(a.amount, a.currency, frozenRate), 0);
+  const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency, frozenRate), 0);
+
+  // Son kayıt tarihi
+  const lastSaveEl = document.getElementById('assets-last-save');
+  if (lastSaveEl) {
+    const ls = Storage.getLastSave();
+    lastSaveEl.textContent = ls ? `Güncellendi: ${ls}` : '';
+  }
 
   // Net worth card
   const primary = settings.currency === 'USD' ? fmtUSD(totalUSD) : fmtTRY(totalTRY);
@@ -304,8 +315,8 @@ function renderAssetList(assets, history) {
 
   const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
   container.innerHTML = assets.map(asset => {
-    const tryVal = toTRY(asset.amount, asset.currency);
-    const usdVal = toUSD(asset.amount, asset.currency);
+    const tryVal = toTRY(asset.amount, asset.currency, frozenRate);
+    const usdVal = toUSD(asset.amount, asset.currency, frozenRate);
     let changeHtml = '';
     if (prevMap[asset.id]) {
       const prevTRY = toTRY(prevMap[asset.id].amount, prevMap[asset.id].currency);
@@ -419,10 +430,34 @@ function saveAsset() {
     assets.push({ id: uid(), category: cat, name, amount, currency, note, createdAt: today() });
   }
   Storage.saveAssets(assets);
+  autoSaveHistorySnapshot();
   checkGamification();
   closeAssetModal();
   renderDashboard();
   showToast(i18n.t('assetSaved'));
+}
+
+function autoSaveHistorySnapshot() {
+  const assets = Storage.getAssets();
+  if (!assets.length) return;
+
+  // Kuru dondur
+  frozenRate = USD_TRY;
+  Storage.saveFrozenRate(frozenRate);
+
+  // Son kayıt tarihini sakla
+  const dateStr = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  Storage.saveLastSave(dateStr);
+
+  // Cari ay için history snapshot yaz
+  const totalTRY = assets.reduce((s, a) => s + toTRY(a.amount, a.currency, frozenRate), 0);
+  const totalUSD = assets.reduce((s, a) => s + toUSD(a.amount, a.currency, frozenRate), 0);
+  const history  = Storage.getHistory();
+  const monthKey = Storage.currentMonthKey();
+  const entry    = { monthKey, date: today(), totalTRY, totalUSD, usdTryRate: frozenRate, snapshot: JSON.parse(JSON.stringify(assets)) };
+  const idx = history.findIndex(h => h.monthKey === monthKey);
+  if (idx >= 0) history[idx] = entry; else history.push(entry);
+  Storage.saveHistory(history);
 }
 
 function deleteAsset() {
@@ -437,28 +472,7 @@ function deleteAsset() {
 
 // ─── Monthly Update ───────────────────────────────────
 function checkMonthlyUpdatePrompt() {
-  const assets = Storage.getAssets();
-  const btn = document.getElementById('header-update-btn');
-  if (!assets.length) { btn.classList.add('hidden'); return; }
-  if (Storage.hasCurrentMonthEntry()) {
-    btn.textContent = '✏️ Düzenle';
-    btn.classList.remove('hidden');
-    return;
-  }
-  const history = Storage.getHistory();
-  if (!history.length) {
-    btn.textContent = '📊 Güncelle';
-    btn.classList.remove('hidden');
-    return;
-  }
-  const settings = Storage.getSettings();
-  const now = new Date();
-  if (now.getDate() >= settings.reminderDay) {
-    btn.textContent = '📊 Güncelle';
-    btn.classList.remove('hidden');
-  } else {
-    btn.classList.add('hidden');
-  }
+  document.getElementById('header-update-btn').classList.add('hidden');
 }
 
 function tryShowReminderNotification() {
