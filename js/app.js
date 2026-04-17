@@ -44,6 +44,7 @@ let setupStep = 1;
 let setupLang = 'tr';
 let setupCurrency = 'TRY';
 let setupReminderDay = 1;
+let setupNotifEnabled = false;
 
 function showSetup() {
   document.getElementById('setup-screen').classList.remove('hidden');
@@ -94,15 +95,28 @@ function setupBack() {
 async function setupFinishWithNotif(allow) {
   if (allow && 'Notification' in window) {
     const perm = await Notification.requestPermission();
-    const enabled = perm === 'granted';
-    completeSetup(enabled);
+    setupNotifEnabled = perm === 'granted';
   } else {
-    completeSetup(false);
+    setupNotifEnabled = false;
   }
+  renderSetupStep(4);
 }
 
-function completeSetup(notifEnabled) {
-  Storage.saveSettings({ language: setupLang, currency: setupCurrency, reminderDay: setupReminderDay, notificationsEnabled: notifEnabled });
+function setupSaveGoal() {
+  const name = document.getElementById('setup-goal-name').value.trim();
+  const amount = parseFloat(document.getElementById('setup-goal-amount').value.replace(',', '.'));
+  const currency = document.getElementById('setup-goal-currency').value;
+  const dateVal = document.getElementById('setup-goal-date').value;
+  if (name && !isNaN(amount) && amount > 0) {
+    const goals = Storage.getGoals();
+    goals.push({ id: uid(), name, targetAmount: amount, targetCurrency: currency, targetDate: dateVal || null, createdAt: today() });
+    Storage.saveGoals(goals);
+  }
+  completeSetup();
+}
+
+function completeSetup() {
+  Storage.saveSettings({ language: setupLang, currency: setupCurrency, reminderDay: setupReminderDay, notificationsEnabled: setupNotifEnabled });
   Storage.setInitialized();
   hideSetup();
   renderApp();

@@ -31,6 +31,7 @@
         <div class="setup-dot active" id="dot-1"></div>
         <div class="setup-dot" id="dot-2"></div>
         <div class="setup-dot" id="dot-3"></div>
+        <div class="setup-dot" id="dot-4"></div>
       </div>
     </div>
 
@@ -86,6 +87,27 @@
       <button class="btn btn-primary btn-full" onclick="setupFinishWithNotif(true)" style="margin-bottom:10px">📲 Evet, izin veriyorum</button>
       <button class="btn btn-secondary btn-full" onclick="setupFinishWithNotif(false)">Şimdilik hayır</button>
       <div class="setup-spacer"></div>
+    </div>
+
+    <!-- Step 4: Goal -->
+    <div class="setup-page hidden" id="setup-step-4">
+      <div class="setup-emoji">🎯</div>
+      <h1 class="setup-title">Hedefini Belirle</h1>
+      <p class="setup-desc">Bir servet hedefi koyarsan motivasyonun artar. İstersen atlayabilirsin.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;width:100%">
+        <input id="setup-goal-name" type="text" class="input" placeholder="Hedef adı (örn: 1 Milyon TL)" maxlength="40">
+        <div style="display:flex;gap:8px">
+          <input id="setup-goal-amount" type="number" class="input" placeholder="Miktar" inputmode="decimal" min="0" step="any" style="flex:1">
+          <select id="setup-goal-currency" class="input" style="width:90px">
+            <option value="TRY">₺ TL</option>
+            <option value="USD">$ USD</option>
+          </select>
+        </div>
+        <input id="setup-goal-date" type="month" class="input" placeholder="Hedef tarihi (isteğe bağlı)">
+      </div>
+      <div class="setup-spacer"></div>
+      <button class="btn btn-primary btn-full" onclick="setupSaveGoal()" style="margin-bottom:10px">🎯 Hedefi Kaydet ve Başla</button>
+      <button class="btn btn-secondary btn-full" onclick="completeSetup()">Atla, sonra girerim</button>
     </div>
 
   </div>
