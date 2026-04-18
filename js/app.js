@@ -87,6 +87,7 @@ async function init() {
     renderApp();
     checkMonthlyUpdatePrompt();
     tryShowReminderNotification();
+    tryShowMotivationalNotification();
   }
 
   // Service worker
@@ -546,6 +547,29 @@ function tryShowReminderNotification() {
     body: 'Varlıklarını güncelleme zamanı! Bu ayın kaydını almayı unutma.',
     icon: '/servetim/icons/icon-192.png',
     badge: '/servetim/icons/icon-192.png',
+  });
+}
+
+function tryShowMotivationalNotification() {
+  const settings = Storage.getSettings();
+  if (!settings.notificationsEnabled) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  const INTERVAL_DAYS = 3;
+  const last = localStorage.getItem('srv_last_motif_notif');
+  if (last) {
+    const daysSince = (Date.now() - parseInt(last)) / 86_400_000;
+    if (daysSince < INTERVAL_DAYS) return;
+  }
+
+  localStorage.setItem('srv_last_motif_notif', Date.now().toString());
+
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  const lang = settings.language || 'tr';
+  new Notification('VarlıkDefteri 💡', {
+    body: `"${q.text[lang]}" — ${q.author}`,
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
   });
 }
 
