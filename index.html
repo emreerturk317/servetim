@@ -35,19 +35,11 @@
       </div>
     </div>
 
-    <!-- Step 1: Language -->
+    <!-- Step 1: Welcome -->
     <div class="setup-page" id="setup-step-1">
       <div class="setup-emoji">💰</div>
       <h1 class="setup-title step1-title">Hoş Geldin 👋</h1>
       <p class="setup-desc step1-desc">VarlıkDefteri ile tüm varlıklarını tek yerde takip et. Basit, güvenli, tamamen senin.</p>
-      <div class="lang-options">
-        <button class="lang-btn selected" data-lang="tr" onclick="setupSelectLang('tr')">
-          <span class="lang-flag">🇹🇷</span>Türkçe
-        </button>
-        <button class="lang-btn" data-lang="en" onclick="setupSelectLang('en')">
-          <span class="lang-flag">🇬🇧</span>English
-        </button>
-      </div>
       <div class="setup-spacer"></div>
       <button class="btn btn-primary btn-full" onclick="setupNext()">İleri →</button>
     </div>
@@ -58,10 +50,10 @@
       <h1 class="setup-title">Ana Para Birimi</h1>
       <p class="setup-desc">Uygulamada öncelikli hangi para birimini görmek istersin?</p>
       <div class="currency-options">
-        <button class="curr-btn selected" data-cur="TRY" onclick="setupSelectCurrency('TRY')">🇹🇷 TL (₺)</button>
-        <button class="curr-btn" data-cur="USD" onclick="setupSelectCurrency('USD')">🇺🇸 USD ($)</button>
-        <button class="curr-btn" data-cur="EUR" onclick="setupSelectCurrency('EUR')">🇪🇺 EUR (€)</button>
-        <button class="curr-btn" data-cur="GBP" onclick="setupSelectCurrency('GBP')">🇬🇧 GBP (£)</button>
+        <button class="curr-btn selected" data-cur="TRY" onclick="setupSelectCurrency('TRY')">TL (₺)</button>
+        <button class="curr-btn" data-cur="USD" onclick="setupSelectCurrency('USD')">USD ($)</button>
+        <button class="curr-btn" data-cur="EUR" onclick="setupSelectCurrency('EUR')">EUR (€)</button>
+        <button class="curr-btn" data-cur="GBP" onclick="setupSelectCurrency('GBP')">GBP (£)</button>
       </div>
       <p class="setup-desc" style="margin-top:0;margin-bottom:12px">📅 Hangi gün hatırlatayım?</p>
       <div class="day-picker" id="day-picker">
@@ -227,14 +219,6 @@
 
         <div class="settings-group-label">Görünüm</div>
         <div class="card">
-          <div class="settings-row">
-            <div class="settings-row-label">Dil</div>
-            <div class="settings-btn-group">
-              <button class="settings-pill" data-lang="tr" onclick="settingsSelectLang('tr')">🇹🇷 TR</button>
-              <button class="settings-pill" data-lang="en" onclick="settingsSelectLang('en')">🇬🇧 EN</button>
-            </div>
-          </div>
-          <div class="settings-sep"></div>
           <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
             <div class="settings-row-label">Ana Para Birimi</div>
             <div class="settings-btn-group">
