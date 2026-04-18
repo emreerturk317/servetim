@@ -630,10 +630,11 @@ function renderRatesModal(rates) {
   }
   const fmt = n => n ? Math.round(n).toLocaleString('tr-TR') : '—';
   const TROY = 31.1035;
-  const gramGold = rates.goldUsdOz ? (rates.goldUsdOz / TROY) * rates.usdTry : null;
-  const ceyrek   = gramGold ? gramGold * 1.6042 : null;
-  const cumhuriyet = gramGold ? gramGold * 6.6147 : null;
-  const gramSilver = rates.silverUsdOz ? (rates.silverUsdOz / TROY) * rates.usdTry : null;
+  // goldTryOz = TRY price per troy oz (from fawazahmed0 CDN)
+  const gramGold   = rates.goldTryOz   ? rates.goldTryOz / TROY   : null;
+  const ceyrek     = gramGold ? gramGold * 1.6042 : null;  // 1.75g @ 22k
+  const cumhuriyet = gramGold ? gramGold * 6.6147 : null;  // 7.216g @ 22k
+  const gramSilver = rates.silverTryOz ? rates.silverTryOz / TROY : null;
 
   document.getElementById('rates-time').textContent = rates.fetchedAt ? `Son güncelleme: ${rates.fetchedAt}` : '';
   document.getElementById('rates-body').innerHTML = [
