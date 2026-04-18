@@ -72,9 +72,9 @@ async function init() {
   // Load frozen rate from storage
   frozenRate = Storage.getFrozenRate();
 
-  // Fetch exchange rate in background (non-blocking)
-  API.getUsdTryRate().then(r => {
-    USD_TRY = r.rate;
+  // Fetch live rates in background (non-blocking)
+  API.getLiveRates().then(r => {
+    USD_TRY = r.usdTry || USD_TRY;
     rateInfo = r;
     updateRateBadge();
     if (Storage.isInitialized()) renderDashboard();
@@ -231,10 +231,7 @@ function onFabClick() {
 // ─── Rate Badge ───────────────────────────────────────
 function updateRateBadge() {
   const badge = document.getElementById('rate-badge');
-  let suffix = '';
-  if (rateInfo.stale) suffix = ` ${i18n.t('rateStale')}`;
-  if (rateInfo.fallback) suffix = ` ${i18n.t('rateFallback')}`;
-  badge.textContent = `$1 = ₺${USD_TRY.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}${suffix}`;
+  badge.textContent = `💱 $1 = ₺${USD_TRY.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}`;
 }
 
 // ─── Conversions ──────────────────────────────────────
@@ -609,6 +606,48 @@ function openUpdateModal(monthKey) {
 
 function closeUpdateModal() {
   document.getElementById('modal-update').classList.add('hidden');
+}
+
+// ─── Rates Modal ──────────────────────────────────────
+function openRatesModal() {
+  document.getElementById('modal-rates').classList.remove('hidden');
+  const rates = API._liveRates;
+  if (rates) {
+    renderRatesModal(rates);
+  } else {
+    document.getElementById('rates-body').innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:16px">Yükleniyor...</div>';
+    API.getLiveRates().then(r => renderRatesModal(r));
+  }
+}
+
+function closeRatesModal() {
+  document.getElementById('modal-rates').classList.add('hidden');
+}
+
+function renderRatesModal(rates) {
+  if (!rates || !rates.usdTry) {
+    document.getElementById('rates-body').innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:16px">Veri alınamadı. İnternet bağlantısını kontrol et.</div>';
+    return;
+  }
+  const fmt = n => n ? Math.round(n).toLocaleString('tr-TR') : '—';
+  const TROY = 31.1035;
+  const gramGold = rates.goldUsdOz ? (rates.goldUsdOz / TROY) * rates.usdTry : null;
+  const ceyrek   = gramGold ? gramGold * 1.6042 : null;
+  const cumhuriyet = gramGold ? gramGold * 6.6147 : null;
+  const gramSilver = rates.silverUsdOz ? (rates.silverUsdOz / TROY) * rates.usdTry : null;
+
+  document.getElementById('rates-time').textContent = rates.fetchedAt ? `Son güncelleme: ${rates.fetchedAt}` : '';
+  document.getElementById('rates-body').innerHTML = [
+    ['💵', '1 Dolar (USD)',          rates.usdTry],
+    ['💶', '1 Euro (EUR)',            rates.eurTry],
+    ['💷', '1 Sterlin (GBP)',         rates.gbpTry],
+    ['🥇', 'Gram Altın (24 Ayar)',    gramGold],
+    ['🪙', 'Çeyrek Altın',            ceyrek],
+    ['🏅', 'Cumhuriyet Altını',       cumhuriyet],
+    ['🥈', 'Gram Gümüş',              gramSilver],
+  ].map(([ emoji, label, val ], i, arr) =>
+    `<div class="rate-row"><span class="rate-label">${emoji} ${label}</span><span class="rate-value">${val ? '₺' + fmt(val) : '—'}</span></div>${i < arr.length - 1 ? '<div class="rate-sep"></div>' : ''}`
+  ).join('');
 }
 
 function saveUpdate() {

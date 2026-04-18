@@ -124,7 +124,7 @@
     <header id="app-header">
       <h1>VarlıkDefteri</h1>
       <div id="header-right">
-        <span id="rate-badge">$1 = ₺38.50</span>
+        <button id="rate-badge" onclick="openRatesModal()">💱 Kurlar</button>
         <button id="header-update-btn" class="hidden" onclick="openUpdateModal()"></button>
       </div>
     </header>
@@ -456,6 +456,20 @@
       <button class="btn btn-secondary" onclick="closeUpdateModal()">İptal</button>
       <button class="btn btn-primary" onclick="saveUpdate()">Güncellemeyi Kaydet</button>
     </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     RATES MODAL
+═══════════════════════════════════════════ -->
+<div id="modal-rates" class="modal-overlay center hidden" onclick="if(event.target===this)closeRatesModal()">
+  <div class="modal-sheet" style="border-radius:var(--radius);max-width:340px;width:90%">
+    <div class="modal-header">
+      <span class="modal-title">💱 Güncel Kurlar</span>
+      <button class="modal-close" onclick="closeRatesModal()">✕</button>
+    </div>
+    <div style="padding:4px 20px 0;font-size:11px;color:var(--text-faint)" id="rates-time"></div>
+    <div class="modal-body" id="rates-body" style="padding:12px 20px 20px"></div>
   </div>
 </div>
 
