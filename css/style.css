@@ -348,6 +348,7 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
 .setup-title { font-size: 1.6rem; margin-bottom: 8px; }
 .setup-desc { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin-bottom: 28px; }
 .setup-spacer { flex: 1; }
+.setup-field-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; }
 .lang-options { display: flex; gap: 10px; margin-bottom: 28px; }
 .lang-btn { flex: 1; padding: 16px; border-radius: var(--radius-sm); background: var(--surface); border: 2px solid var(--border); text-align: center; font-weight: 700; font-size: 15px; transition: all var(--transition); }
 .lang-btn .lang-flag { font-size: 28px; display: block; margin-bottom: 4px; }

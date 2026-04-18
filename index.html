@@ -94,16 +94,25 @@
       <div class="setup-emoji">🎯</div>
       <h1 class="setup-title">Hedefini Belirle</h1>
       <p class="setup-desc">Bir servet hedefi koyarsan motivasyonun artar. İstersen atlayabilirsin.</p>
-      <div style="display:flex;flex-direction:column;gap:12px;width:100%">
-        <input id="setup-goal-name" type="text" class="input" placeholder="Hedef adı (örn: 1 Milyon TL)" maxlength="40">
-        <div style="display:flex;gap:8px">
-          <input id="setup-goal-amount" type="number" class="input" placeholder="Miktar" inputmode="decimal" min="0" step="any" style="flex:1">
-          <select id="setup-goal-currency" class="input" style="width:90px">
-            <option value="TRY">₺ TL</option>
-            <option value="USD">$ USD</option>
-          </select>
+      <div style="display:flex;flex-direction:column;gap:14px;width:100%">
+        <div>
+          <div class="setup-field-label">Hedef Adı</div>
+          <input id="setup-goal-name" type="text" class="form-input" placeholder="örn: 1 Milyon TL, Ev, Araba…" maxlength="40">
         </div>
-        <input id="setup-goal-date" type="month" class="input" placeholder="Hedef tarihi (isteğe bağlı)">
+        <div>
+          <div class="setup-field-label">Hedef Tutarı</div>
+          <div style="display:flex;gap:8px">
+            <input id="setup-goal-amount" type="number" class="form-input" placeholder="0" inputmode="decimal" min="0" step="any" style="flex:1">
+            <select id="setup-goal-currency" class="form-select" style="width:100px">
+              <option value="TRY">₺ TL</option>
+              <option value="USD">$ USD</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="setup-field-label">Hedef Tarihi <span style="color:var(--text-faint);font-weight:400">(isteğe bağlı)</span></div>
+          <input id="setup-goal-date" type="month" class="form-input">
+        </div>
       </div>
       <div class="setup-spacer"></div>
       <button class="btn btn-primary btn-full" onclick="setupSaveGoal()" style="margin-bottom:10px">🎯 Hedefi Kaydet ve Başla</button>
