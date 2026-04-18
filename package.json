@@ -1,0 +1,28 @@
+{
+  "name": "servetim-uygulamasi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sw.js",
+  "scripts": {
+    "build": "node scripts/build-www.js",
+    "sync": "npm run build && npx cap sync android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emreerturk317/servetim.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/emreerturk317/servetim/issues"
+  },
+  "homepage": "https://github.com/emreerturk317/servetim#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/local-notifications": "^8.0.2"
+  }
+}

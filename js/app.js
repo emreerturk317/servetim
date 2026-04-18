@@ -87,7 +87,7 @@ async function init() {
     renderApp();
     checkMonthlyUpdatePrompt();
     tryShowReminderNotification();
-    tryShowMotivationalNotification();
+    scheduleMotivationalNotification();
   }
 
   // Service worker
@@ -550,27 +550,45 @@ function tryShowReminderNotification() {
   });
 }
 
-function tryShowMotivationalNotification() {
+async function scheduleMotivationalNotification() {
+  // Yalnızca Capacitor native ortamında çalışır (APK)
+  const LN = window.Capacitor?.Plugins?.LocalNotifications;
+  if (!LN) return;
+
   const settings = Storage.getSettings();
   if (!settings.notificationsEnabled) return;
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
-  const INTERVAL_DAYS = 3;
-  const last = localStorage.getItem('srv_last_motif_notif');
-  if (last) {
-    const daysSince = (Date.now() - parseInt(last)) / 86_400_000;
-    if (daysSince < INTERVAL_DAYS) return;
-  }
+  // İzin iste
+  try {
+    const { display } = await LN.checkPermissions();
+    if (display !== 'granted') {
+      const result = await LN.requestPermissions();
+      if (result.display !== 'granted') return;
+    }
 
-  localStorage.setItem('srv_last_motif_notif', Date.now().toString());
+    // Zaten zamanlanmışsa tekrar ekleme
+    const { notifications: pending } = await LN.getPending();
+    if (pending.some(n => n.id === 1001)) return;
 
-  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-  const lang = settings.language || 'tr';
-  new Notification('VarlıkDefteri 💡', {
-    body: `"${q.text[lang]}" — ${q.author}`,
-    icon: './icons/icon-192.png',
-    badge: './icons/icon-192.png',
-  });
+    // Rastgele söz seç
+    const lang = settings.language || 'tr';
+    const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+    // 3 gün sonrası için zamanla
+    const fireAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+    await LN.schedule({
+      notifications: [{
+        id: 1001,
+        title: 'VarlıkDefteri 💡',
+        body: `"${q.text[lang]}" — ${q.author}`,
+        schedule: { at: fireAt },
+        sound: null,
+        smallIcon: 'ic_stat_icon_config_sample',
+        iconColor: '#2d6a4f',
+      }]
+    });
+  } catch (e) {}
 }
 
 let _editingMonthKey = null; // null = current month, string = past month key
