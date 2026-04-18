@@ -1080,11 +1080,32 @@ function settingsSelectDay(day) {
 async function settingsToggleNotif() {
   if (!settingsTemp.notificationsEnabled) {
     if (!('Notification' in window)) {
-      showToast('Tarayıcın bildirim desteklemiyor');
+      const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+      if (isIOS) {
+        openNotifGuideModal('iOS\'ta bildirim almak için uygulamayı önce Ana Ekrana eklemen gerekiyor.', [
+          'Safari\'de sayfayı aç',
+          'Alt menüden "Paylaş" simgesine bas',
+          '"Ana Ekrana Ekle" seçeneğini seç',
+          'Eklenen simgeden uygulamayı aç',
+          'Ardından bildirimlere izin ver'
+        ]);
+      } else {
+        openNotifGuideModal('Bu tarayıcı veya uygulama bildirimi desteklemiyor.', [
+          'Google Chrome ile siteyi aç',
+          'Adres çubuğundaki kilit simgesine bas',
+          '"Site ayarları" → "Bildirimler" → "İzin ver"',
+          'Sayfayı yenile ve tekrar dene'
+        ]);
+      }
       return;
     }
     if (Notification.permission === 'denied') {
-      showToast('Tarayıcı ayarları → Site izinleri → Bildirimler → İzin ver');
+      openNotifGuideModal('Bildirim izni daha önce reddedildi. Tarayıcı ayarlarından manuel olarak açman gerekiyor.', [
+        'Chrome\'da adres çubuğundaki kilit simgesine bas',
+        '"Site ayarları" → "Bildirimler" seçeneğine git',
+        '"İzin ver" olarak değiştir',
+        'Sayfayı yenile ve tekrar dene'
+      ]);
       return;
     }
     if (Notification.permission === 'granted') {
@@ -1094,7 +1115,7 @@ async function settingsToggleNotif() {
     }
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      showToast('Tarayıcı ayarları → Site izinleri → Bildirimler → İzin ver');
+      showToast('Bildirim izni verilmedi');
       return;
     }
     settingsTemp.notificationsEnabled = true;
@@ -1102,6 +1123,18 @@ async function settingsToggleNotif() {
     settingsTemp.notificationsEnabled = false;
   }
   document.getElementById('settings-notif-switch').classList.toggle('on', settingsTemp.notificationsEnabled);
+}
+
+function openNotifGuideModal(desc, steps) {
+  const el = document.getElementById('modal-notif-guide');
+  document.getElementById('notif-guide-desc').textContent = desc;
+  document.getElementById('notif-guide-steps').innerHTML = steps
+    .map((s, i) => `<div class="notif-step"><span class="notif-step-num">${i + 1}</span><span>${s}</span></div>`)
+    .join('');
+  el.classList.remove('hidden');
+}
+function closeNotifGuideModal() {
+  document.getElementById('modal-notif-guide').classList.add('hidden');
 }
 
 function saveSettingsPage() {

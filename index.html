@@ -502,6 +502,23 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
+     NOTIF GUIDE MODAL
+═══════════════════════════════════════════ -->
+<div id="modal-notif-guide" class="modal-overlay center hidden" onclick="if(event.target===this)closeNotifGuideModal()">
+  <div class="modal-sheet" style="border-radius:var(--radius);max-width:340px;width:92%">
+    <div class="modal-header">
+      <span class="modal-title">🔔 Bildirim Ayarı</span>
+      <button class="modal-close" onclick="closeNotifGuideModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px 20px">
+      <p id="notif-guide-desc" style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.5"></p>
+      <div id="notif-guide-steps" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="closeNotifGuideModal()">Tamam</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
      HELP MODAL
 ═══════════════════════════════════════════ -->
 <div id="modal-help" class="modal-overlay center hidden" onclick="if(event.target===this)closeHelpModal()">
