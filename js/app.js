@@ -24,13 +24,34 @@ const QUOTES = [
   { text: { tr: 'Zenginlik para sahibi olmak değil, seçeneklere sahip olmaktır.', en: 'Wealth is not about having money, it\'s about having options.' }, author: 'Chris Rock' },
   { text: { tr: 'Harcadıktan sonra kalanı değil, biriktirdikten sonra kalanı harca.', en: 'Do not save what is left after spending, spend what is left after saving.' }, author: 'Warren Buffett' },
   { text: { tr: 'Disiplin, hedef ile başarı arasındaki köprüdür.', en: 'Discipline is the bridge between goals and accomplishment.' }, author: 'Jim Rohn' },
+  { text: { tr: 'Zengin olmak bir tercih meselesidir; çoğu insan sadece alışkanlıklarını değiştirmeyi seçmez.', en: 'Being rich is a choice; most people just choose not to change their habits.' }, author: 'T. Harv Eker' },
+  { text: { tr: 'Paranın peşinden gitme; işinin peşinden git, para seni takip eder.', en: 'Don\'t chase money; chase your craft, and the money will follow.' }, author: 'Tony Hsieh' },
+  { text: { tr: 'Geliri artırmak değil, tasarrufu artırmak sizi zengin yapar.', en: 'It\'s not your salary that makes you rich, it\'s your spending habits.' }, author: 'Charles A. Jaffe' },
+  { text: { tr: 'Bugün yaptığın fedakarlıklar, yarın özgürlük olarak geri döner.', en: 'The sacrifices you make today will pay dividends for years to come.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Bir insan ne düşünürse o olur.', en: 'A man is what he thinks about all day long.' }, author: 'Ralph Waldo Emerson' },
+  { text: { tr: 'Büyük düşün, küçük başla, hızlı öğren.', en: 'Think big, start small, learn fast.' }, author: 'Reid Hoffman' },
+  { text: { tr: 'Başarılı insanlar fırsatlar arar; başarısız insanlar bahane arar.', en: 'Successful people look for opportunities; unsuccessful people look for excuses.' }, author: 'Napoleon Hill' },
+  { text: { tr: 'İlk milyonu kazanmak en zor olanıdır.', en: 'The first million is the hardest to make.' }, author: 'Anonim' },
+  { text: { tr: 'Zaman, paranın en değerli bileşenidir.', en: 'Time is the most valuable component of money.' }, author: 'Charlie Munger' },
+  { text: { tr: 'Mükemmellik bir alışkanlıktır, bir eylem değil.', en: 'Excellence is not an act, but a habit.' }, author: 'Aristotle' },
+  { text: { tr: 'Servetini korumak, servet kazanmak kadar önemlidir.', en: 'Protecting your wealth is just as important as building it.' }, author: 'Charlie Munger' },
+  { text: { tr: 'Her yatırım bir risk taşır; ama hiç yatırım yapmamak en büyük risktir.', en: 'Every investment carries risk; but not investing at all is the greatest risk.' }, author: 'Peter Lynch' },
+  { text: { tr: 'Başkalarının korktuğu zaman aç gözlü, açgözlü olduğunda korkak ol.', en: 'Be fearful when others are greedy, and greedy when others are fearful.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Piyasa kısa vadede oylama makinesidir, uzun vadede tartı makinesidir.', en: 'The market is a voting machine in the short run and a weighing machine in the long run.' }, author: 'Benjamin Graham' },
+  { text: { tr: 'Hayatını planla; planını yaşa.', en: 'Plan your life; live your plan.' }, author: 'Dave Ramsey' },
+  { text: { tr: 'Gelecekte nerede olmak istediğini bil; oraya giden yolu bul.', en: 'Know where you want to be; find the way to get there.' }, author: 'Elon Musk' },
+  { text: { tr: 'Başarı tesadüf değildir; hazırlık, çalışma, öğrenme ve fedakarlığın ürünüdür.', en: 'Success is no accident; it\'s preparation, hard work, learning and sacrifice.' }, author: 'Pelé' },
+  { text: { tr: 'İnsanlar harcamalarını küçük zevkler için yaparlar, büyük hayaller için değil.', en: 'People spend money for small pleasures, not for big dreams.' }, author: 'Robert Kiyosaki' },
+  { text: { tr: 'Birikimleriniz sizi besler; harcamalarınız sizi tüketir.', en: 'Your savings feed you; your expenses consume you.' }, author: 'Anonim' },
 ];
 
+let _sessionQuote = null;
+
 function renderQuote() {
+  if (!_sessionQuote) _sessionQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
   const lang = i18n.current;
-  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
-  document.getElementById('quote-text').textContent = `"${q.text[lang]}"`;
-  document.getElementById('quote-author').textContent = `— ${q.author}`;
+  document.getElementById('quote-text').textContent = `"${_sessionQuote.text[lang]}"`;
+  document.getElementById('quote-author').textContent = `— ${_sessionQuote.author}`;
 }
 
 // ─── State ───────────────────────────────────────────
