@@ -607,6 +607,10 @@ function closeUpdateModal() {
   document.getElementById('modal-update').classList.add('hidden');
 }
 
+// ─── Legal Modal ──────────────────────────────────────
+function openLegalModal()  { document.getElementById('modal-legal').classList.remove('hidden'); }
+function closeLegalModal() { document.getElementById('modal-legal').classList.add('hidden'); }
+
 // ─── Rates Modal ──────────────────────────────────────
 function openRatesModal() {
   document.getElementById('modal-rates').classList.remove('hidden');
