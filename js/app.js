@@ -611,6 +611,10 @@ function closeUpdateModal() {
 function openLegalModal()  { document.getElementById('modal-legal').classList.remove('hidden'); }
 function closeLegalModal() { document.getElementById('modal-legal').classList.add('hidden'); }
 
+// ─── Help Modal ───────────────────────────────────────
+function openHelpModal()  { document.getElementById('modal-help').classList.remove('hidden'); }
+function closeHelpModal() { document.getElementById('modal-help').classList.add('hidden'); }
+
 // ─── Rates Modal ──────────────────────────────────────
 function openRatesModal() {
   document.getElementById('modal-rates').classList.remove('hidden');

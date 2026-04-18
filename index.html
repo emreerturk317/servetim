@@ -273,12 +273,20 @@
           </div>
         </div>
 
-        <!-- Yasal Bilgiler -->
+        <!-- Yasal Bilgiler + Yardım -->
         <div class="card" style="margin-top:24px">
           <div class="settings-row" onclick="openLegalModal()" style="cursor:pointer">
             <div>
               <div class="settings-row-label">📋 Yasal Bilgiler</div>
               <div class="settings-row-sub">Gizlilik, sorumluluk reddi ve uygulama hakkında</div>
+            </div>
+            <span style="font-size:20px;color:var(--text-muted)">›</span>
+          </div>
+          <div class="settings-sep"></div>
+          <div class="settings-row" onclick="openHelpModal()" style="cursor:pointer">
+            <div>
+              <div class="settings-row-label">❓ Yardım</div>
+              <div class="settings-row-sub">Sık sorulan sorular ve kullanım kılavuzu</div>
             </div>
             <span style="font-size:20px;color:var(--text-muted)">›</span>
           </div>
@@ -489,6 +497,62 @@
         <div class="legal-title">🔄 Değişiklikler</div>
         <div class="legal-body">Uygulama özellikleri ve bu bilgiler önceden haber vermeksizin değiştirilebilir.</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HELP MODAL
+═══════════════════════════════════════════ -->
+<div id="modal-help" class="modal-overlay center hidden" onclick="if(event.target===this)closeHelpModal()">
+  <div class="modal-sheet" style="border-radius:var(--radius);max-width:360px;width:92%;max-height:88vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-title">❓ Yardım</span>
+      <button class="modal-close" onclick="closeHelpModal()">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0 20px 20px">
+
+      <div class="legal-section">
+        <div class="legal-title">➕ Varlık nasıl eklenir?</div>
+        <div class="legal-body">Ana ekranda sağ alttaki <strong>+</strong> butonuna bas. Varlık adı, türü, değeri ve para birimini gir, Kaydet'e bas. Varlığın anında listeye eklenir.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">🗂️ Varlık türleri nelerdir?</div>
+        <div class="legal-body"><strong>Banka / Nakit:</strong> Banka hesapları, nakit para.<br><strong>Altın:</strong> Gram altın, sikke, bilezik vb.<br><strong>Kripto:</strong> Bitcoin, Ethereum ve diğer kripto paralar.<br><strong>Hisse / Fon:</strong> Hisse senetleri, yatırım fonları, ETF.<br><strong>Gayrimenkul / Diğer:</strong> Arsa, ev, araç ve diğer varlıklar.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">💱 Fiyatlar nasıl güncelleniyor?</div>
+        <div class="legal-body">Dolar, Euro ve Sterlin kurları uygulama her açıldığında internetten otomatik çekilir. "Güncel Kurlar" butonuna basarak anlık kur ve altın fiyatlarını görebilirsin. Varlık değerlerin ise senin girdiğin rakamlara göre hesaplanır — otomatik güncellenmez.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">🔒 Verilerim güvende mi?</div>
+        <div class="legal-body">Evet. Tüm veriler yalnızca bu cihazda saklanır, hiçbir sunucuya gönderilmez. İnternet bağlantısı olmadan da çalışır. Verilerin güvenliği tamamen cihazına bağlıdır.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">💾 Verilerimi nasıl yedeklerim?</div>
+        <div class="legal-body">Ayarlar → <strong>Veriyi Dışa Aktar</strong> seçeneğiyle tüm verilerini JSON dosyası olarak indirebilirsin. Telefonu değiştirirken veya uygulama silinmeden önce mutlaka yedek al. Yedeği geri yüklemek için <strong>Veriyi İçe Aktar</strong> seçeneğini kullan.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">📈 Grafik bölümü ne işe yarar?</div>
+        <div class="legal-body">Her ay varlıklarını kaydettiğinde bir snapshot oluşturulur. Grafik bölümü bu aylık snapshot'ları göstererek servetinin zaman içinde nasıl değiştiğini görsel olarak sunar. En az 2 aylık kayıt gereklidir.</div>
+      </div>
+      <div class="legal-sep"></div>
+
+      <div class="legal-section">
+        <div class="legal-title">🎯 Hedef bölümü ne işe yarar?</div>
+        <div class="legal-body">Finansal bir hedef belirleyebilirsin (örn. 1 milyon TL, ev, araba). Mevcut servetine göre hedefe ne kadar yaklaştığını yüzde olarak gösterir. Hedef tarihi girersen tahmini ulaşım süresini de hesaplar.</div>
+      </div>
+
     </div>
   </div>
 </div>
