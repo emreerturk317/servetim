@@ -1,4 +1,4 @@
-const CACHE_NAME = 'varlikdefteri-v5';
+const CACHE_NAME = 'varlikdefteri-v6';
 const ASSETS = [
   './',
   './index.html',

@@ -230,8 +230,7 @@ function onFabClick() {
 
 // ─── Rate Badge ───────────────────────────────────────
 function updateRateBadge() {
-  const badge = document.getElementById('rate-badge');
-  badge.textContent = `💱 $1 = ₺${USD_TRY.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}`;
+  // badge text is static; no update needed
 }
 
 // ─── Conversions ──────────────────────────────────────

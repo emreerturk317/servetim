@@ -24,17 +24,28 @@ const API = {
   async getLiveRates() {
     if (this._liveRates) return this._liveRates;
     try {
-      const res = await fetch(this.URL, { signal: AbortSignal.timeout(6000) });
-      const data = await res.json();
-      const r = data.rates;
-      const usdTry = r.TRY;
-      Storage.saveExchangeRate({ usdTry, fetchedAt: new Date().toISOString() });
+      const [fxRes, metalRes] = await Promise.allSettled([
+        fetch(this.URL, { signal: AbortSignal.timeout(6000) }),
+        fetch('https://api.metals.live/v1/spot/gold,silver', { signal: AbortSignal.timeout(6000) })
+      ]);
+
+      const fxData = fxRes.status === 'fulfilled' ? await fxRes.value.json() : null;
+      const metalData = metalRes.status === 'fulfilled' ? await metalRes.value.json() : null;
+
+      const r = fxData?.rates || {};
+      const usdTry = r.TRY || (Storage.getExchangeRate()?.usdTry) || 38.5;
+      if (r.TRY) Storage.saveExchangeRate({ usdTry, fetchedAt: new Date().toISOString() });
+
+      // metals.live returns [{gold: price}, {silver: price}] in USD/troy oz
+      const goldUsdOz = metalData?.[0]?.gold || null;
+      const silverUsdOz = metalData?.[1]?.silver || null;
+
       this._liveRates = {
         usdTry,
         eurTry: r.EUR ? usdTry / r.EUR : null,
         gbpTry: r.GBP ? usdTry / r.GBP : null,
-        goldUsdOz: r.XAU ? 1 / r.XAU : null,
-        silverUsdOz: r.XAG ? 1 / r.XAG : null,
+        goldUsdOz,
+        silverUsdOz,
         fetchedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
         ok: true
       };
