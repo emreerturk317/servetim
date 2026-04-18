@@ -47,6 +47,7 @@ const i18n = {
       gold: 'Altın',
       crypto: 'Kripto',
       property: 'Gayrimenkul / Diğer',
+      stock: 'Hisse / Fon',
 
       // Asset form
       assetName: 'Varlık Adı',
@@ -154,6 +155,7 @@ const i18n = {
       gold: 'Gold',
       crypto: 'Crypto',
       property: 'Real Estate / Other',
+      stock: 'Stocks / Funds',
 
       assetName: 'Asset Name',
       assetNamePlaceholder: 'Bank Account, Gold, Property...',

@@ -317,13 +317,13 @@ function renderDonut(assets) {
   if (!assets.length) { wrap.classList.add('hidden'); return; }
   wrap.classList.remove('hidden');
 
-  const cats = { bank: 0, gold: 0, crypto: 0, property: 0 };
+  const cats = { bank: 0, gold: 0, crypto: 0, property: 0, stock: 0 };
   assets.forEach(a => { cats[a.category] = (cats[a.category] || 0) + toTRY(a.amount, a.currency); });
   const labels = Object.keys(cats).filter(k => cats[k] > 0);
   const values = labels.map(k => cats[k]);
-  const colors = { bank: '#1a5276', gold: '#b5860d', crypto: '#f7931a', property: '#7c3aed' };
-  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property') };
-  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
+  const colors = { bank: '#1a5276', gold: '#b5860d', crypto: '#f7931a', property: '#7c3aed', stock: '#0d9488' };
+  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property'), stock: i18n.t('stock') };
+  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠', stock: '📈' };
 
   const ctx = document.getElementById('donut-chart').getContext('2d');
   if (donutChart) donutChart.destroy();
@@ -418,9 +418,9 @@ function openAssetModal(id) {
   modal.querySelector('.modal-title').textContent = asset ? i18n.t('editAsset') : i18n.t('newAsset');
 
   // Category
-  const cats = ['bank', 'gold', 'crypto', 'property'];
-  const catEmojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
-  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property') };
+  const cats = ['bank', 'gold', 'crypto', 'property', 'stock'];
+  const catEmojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠', stock: '📈' };
+  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property'), stock: i18n.t('stock') };
 
   const selCat = asset?.category || 'bank';
   document.getElementById('asset-cat-grid').innerHTML = cats.map(c =>

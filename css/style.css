@@ -15,6 +15,8 @@
   --crypto-pale: #fff7ed;
   --purple: #7c3aed;
   --purple-pale: #ede9fe;
+  --stock: #0d9488;
+  --stock-pale: #ccfbf1;
   --text: #1a1a1a;
   --text-muted: #6b7280;
   --text-faint: #9ca3af;
@@ -167,6 +169,7 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
 .asset-icon.gold    { background: var(--gold-pale); }
 .asset-icon.crypto  { background: var(--crypto-pale); }
 .asset-icon.property { background: var(--purple-pale); }
+.asset-icon.stock    { background: var(--stock-pale); }
 .asset-info { flex: 1; min-width: 0; }
 .asset-name { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .asset-note { font-size: 11px; color: var(--text-muted); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -318,6 +321,7 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
 .cat-btn.selected.gold     { border-color: var(--gold);   background: var(--gold-pale);   color: var(--gold); }
 .cat-btn.selected.crypto   { border-color: var(--crypto); background: var(--crypto-pale); color: var(--crypto); }
 .cat-btn.selected.property { border-color: var(--purple); background: var(--purple-pale); color: var(--purple); }
+.cat-btn.selected.stock    { border-color: var(--stock);  background: var(--stock-pale);  color: var(--stock); }
 .cat-btn .cat-emoji { font-size: 22px; }
 
 .currency-toggle { display: flex; background: var(--surface2); border-radius: var(--radius-sm); overflow: hidden; }
