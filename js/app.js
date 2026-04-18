@@ -1120,7 +1120,40 @@ function settingsSelectDay(day) {
 }
 
 async function settingsToggleNotif() {
+  const notifSwitch = document.getElementById('settings-notif-switch');
   if (!settingsTemp.notificationsEnabled) {
+
+    // ── Capacitor APK yolu ──────────────────────────
+    const LN = window.Capacitor?.Plugins?.LocalNotifications;
+    if (LN) {
+      try {
+        const { display } = await LN.checkPermissions();
+        if (display === 'granted') {
+          settingsTemp.notificationsEnabled = true;
+          notifSwitch.classList.add('on');
+          scheduleMotivationalNotification();
+          return;
+        }
+        const result = await LN.requestPermissions();
+        if (result.display === 'granted') {
+          settingsTemp.notificationsEnabled = true;
+          scheduleMotivationalNotification();
+        } else {
+          openNotifGuideModal('Bildirim izni reddedildi. Telefon ayarlarından manuel olarak açabilirsin.', [
+            'Telefonun "Ayarlar" uygulamasını aç',
+            '"Uygulamalar" → "VarlıkDefteri"ni bul',
+            '"Bildirimler"e gir',
+            '"Tüm bildirimlere izin ver"i aç',
+          ]);
+        }
+      } catch (e) {
+        showToast('Bildirim izni alınamadı');
+      }
+      notifSwitch.classList.toggle('on', settingsTemp.notificationsEnabled);
+      return;
+    }
+
+    // ── Web tarayıcı yolu ───────────────────────────
     if (!('Notification' in window)) {
       const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
       if (isIOS) {
@@ -1129,30 +1162,30 @@ async function settingsToggleNotif() {
           'Alt menüden "Paylaş" simgesine bas',
           '"Ana Ekrana Ekle" seçeneğini seç',
           'Eklenen simgeden uygulamayı aç',
-          'Ardından bildirimlere izin ver'
+          'Ardından bildirimlere izin ver',
         ]);
       } else {
-        openNotifGuideModal('Bu tarayıcı veya uygulama bildirimi desteklemiyor.', [
-          'Google Chrome ile siteyi aç',
+        openNotifGuideModal('Bu tarayıcı bildirimi desteklemiyor.', [
+          'Chrome veya Firefox tarayıcısını aç',
           'Adres çubuğundaki kilit simgesine bas',
           '"Site ayarları" → "Bildirimler" → "İzin ver"',
-          'Sayfayı yenile ve tekrar dene'
+          'Sayfayı yenile ve tekrar dene',
         ]);
       }
       return;
     }
     if (Notification.permission === 'denied') {
-      openNotifGuideModal('Bildirim izni daha önce reddedildi. Tarayıcı ayarlarından manuel olarak açman gerekiyor.', [
-        'Chrome\'da adres çubuğundaki kilit simgesine bas',
+      openNotifGuideModal('Bildirim izni daha önce reddedildi. Tarayıcı ayarlarından manuel açman gerekiyor.', [
+        'Adres çubuğundaki kilit simgesine bas',
         '"Site ayarları" → "Bildirimler" seçeneğine git',
         '"İzin ver" olarak değiştir',
-        'Sayfayı yenile ve tekrar dene'
+        'Sayfayı yenile ve tekrar dene',
       ]);
       return;
     }
     if (Notification.permission === 'granted') {
       settingsTemp.notificationsEnabled = true;
-      document.getElementById('settings-notif-switch').classList.add('on');
+      notifSwitch.classList.add('on');
       return;
     }
     const perm = await Notification.requestPermission();
@@ -1164,7 +1197,7 @@ async function settingsToggleNotif() {
   } else {
     settingsTemp.notificationsEnabled = false;
   }
-  document.getElementById('settings-notif-switch').classList.toggle('on', settingsTemp.notificationsEnabled);
+  notifSwitch.classList.toggle('on', settingsTemp.notificationsEnabled);
 }
 
 function openNotifGuideModal(desc, steps) {
