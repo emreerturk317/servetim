@@ -2,6 +2,37 @@
    Servetim — Main Application
    =================================================== */
 
+// ─── Quotes ──────────────────────────────────────────
+const QUOTES = [
+  { text: { tr: 'Uyurken para kazanmayan biri, ömür boyu çalışmak zorunda kalır.', en: 'If you don\'t find a way to make money while you sleep, you will work until you die.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Zenginler para için çalışmaz; para onlar için çalışır.', en: 'Rich people don\'t work for money; money works for them.' }, author: 'Robert Kiyosaki' },
+  { text: { tr: 'Fakir doğmak senin hatan değil, ama fakir ölmek senin hatandır.', en: 'Being poor is not your fault, but staying poor is.' }, author: 'Bill Gates' },
+  { text: { tr: 'Bileşik faiz dünyanın sekizinci harikasıdır.', en: 'Compound interest is the eighth wonder of the world.' }, author: 'Albert Einstein' },
+  { text: { tr: 'Çok para kazanmak zor değil; onu korumak asıl zor olandır.', en: 'It\'s not about how much money you make, but how much you keep.' }, author: 'Robert Kiyosaki' },
+  { text: { tr: 'Gelecek, hayallerinin güzelliğine inananlarındır.', en: 'The future belongs to those who believe in the beauty of their dreams.' }, author: 'Eleanor Roosevelt' },
+  { text: { tr: 'Başarının sırrı, başlamaktır.', en: 'The secret of getting ahead is getting started.' }, author: 'Mark Twain' },
+  { text: { tr: 'En iyi yatırım kendinize yaptığınız yatırımdır.', en: 'The best investment you can make is in yourself.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Risk almamak, en büyük risktir.', en: 'The biggest risk is not taking any risk.' }, author: 'Mark Zuckerberg' },
+  { text: { tr: 'Paranızı sizin için çalıştırın; yoksa sonsuza kadar onun için çalışırsınız.', en: 'Make your money work for you or you\'ll always work for money.' }, author: 'Napoleon Hill' },
+  { text: { tr: 'Mali özgürlük, onu öğrenenler ve bunun için çalışanlar için vardır.', en: 'Financial freedom is available to those who learn about it and work for it.' }, author: 'Robert Kiyosaki' },
+  { text: { tr: 'Başarısızlık, daha akıllıca yeniden başlamak için bir fırsattır.', en: 'Failure is simply the opportunity to begin again more intelligently.' }, author: 'Henry Ford' },
+  { text: { tr: 'Ne kadar kazandığın değil, ne kadar biriktirdiğin önemlidir.', en: 'It\'s not what you earn, it\'s what you keep.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Küçük miktarlar zamanla büyük servetlere dönüşür.', en: 'Small amounts, invested wisely, can lead to great wealth over time.' }, author: 'T. Harv Eker' },
+  { text: { tr: 'Servet inşa etmek bir maraton, sprint değildir.', en: 'Building wealth is a marathon, not a sprint.' }, author: 'Dave Ramsey' },
+  { text: { tr: 'Her büyük servet küçük bir tasarrufla başlar.', en: 'Every great fortune starts with a small saving.' }, author: 'Napoleon Hill' },
+  { text: { tr: 'Fırsatlar kaybolmaz; onları kaçırırsanız başkası yakalar.', en: 'Opportunities don\'t go away — they go to someone else.' }, author: 'Anonim' },
+  { text: { tr: 'Zenginlik para sahibi olmak değil, seçeneklere sahip olmaktır.', en: 'Wealth is not about having money, it\'s about having options.' }, author: 'Chris Rock' },
+  { text: { tr: 'Harcadıktan sonra kalanı değil, biriktirdikten sonra kalanı harca.', en: 'Do not save what is left after spending, spend what is left after saving.' }, author: 'Warren Buffett' },
+  { text: { tr: 'Disiplin, hedef ile başarı arasındaki köprüdür.', en: 'Discipline is the bridge between goals and accomplishment.' }, author: 'Jim Rohn' },
+];
+
+function renderQuote() {
+  const lang = i18n.current;
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  document.getElementById('quote-text').textContent = `"${q.text[lang]}"`;
+  document.getElementById('quote-author').textContent = `— ${q.author}`;
+}
+
 // ─── State ───────────────────────────────────────────
 let USD_TRY = 38.5;
 let frozenRate = 38.5;
@@ -244,6 +275,9 @@ function renderDashboard() {
     changeEl.classList.add('hidden');
   }
 
+  // Motivasyon sözü
+  renderQuote();
+
   // Donut chart
   renderDonut(assets);
 
@@ -431,6 +465,7 @@ function saveAsset() {
   }
   Storage.saveAssets(assets);
   autoSaveHistorySnapshot();
+  Sounds.coin();
   checkGamification();
   closeAssetModal();
   renderDashboard();
@@ -640,6 +675,7 @@ function showBadgePopup(id) {
   document.getElementById('badge-popup-name').textContent = Gamification.getBadgeName(id, lang);
   document.getElementById('badge-popup-desc').textContent = Gamification.getBadgeDesc(id, lang);
   popup.classList.remove('hidden');
+  Sounds.badge();
   launchConfetti();
 }
 

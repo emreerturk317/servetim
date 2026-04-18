@@ -1,4 +1,4 @@
-const CACHE_NAME = 'servetim-v10';
+const CACHE_NAME = 'servetim-v11';
 const ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,7 @@ const ASSETS = [
   './js/storage.js',
   './js/api.js',
   './js/gamification.js',
+  './js/sounds.js',
   './js/app.js',
   'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@300;400;500;600;700&display=swap',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'

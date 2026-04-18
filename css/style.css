@@ -438,6 +438,29 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; }
 .hmc-asset-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--text); }
 .hmc-meta { font-size: 11px; color: var(--text-faint); margin-top: 8px; }
 
+/* ===== QUOTE CARD ===== */
+#quote-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  border-left: 3px solid var(--primary);
+  box-shadow: var(--shadow);
+}
+#quote-text {
+  font-size: 13px;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+#quote-author {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: right;
+}
+
 /* ===== SETTINGS PAGE ===== */
 .settings-group-label {
   font-size: 11px; font-weight: 700; color: var(--text-muted);
