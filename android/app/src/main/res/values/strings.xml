@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VarlıkDefteri</string>
+    <string name="title_activity_main">VarlıkDefteri</string>
+    <string name="package_name">com.servetim.app</string>
+    <string name="custom_url_scheme">com.servetim.app</string>
+</resources>

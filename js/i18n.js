@@ -3,14 +3,14 @@ const i18n = {
 
   strings: {
     tr: {
-      appName: 'Servetim',
+      appName: 'VarlıkDefteri',
       save: 'Kaydet', cancel: 'İptal', delete: 'Sil', edit: 'Düzenle',
       add: 'Ekle', close: 'Kapat', next: 'İleri', back: 'Geri', confirm: 'Onayla',
       yes: 'Evet', no: 'Hayır',
 
       // Setup
       welcome: 'Hoş Geldin 👋',
-      welcomeDesc: 'Servetim ile tüm varlıklarını tek yerde takip et. Basit, güvenli, tamamen senin.',
+      welcomeDesc: 'VarlıkDefteri ile tüm varlıklarını tek yerde takip et. Basit, güvenli, tamamen senin.',
       selectLanguage: 'Dil Seçin',
       selectCurrency: 'Ana Para Birimi',
       currencyDesc: 'Uygulamada öncelikli hangi para birimini görmek istersin?',
@@ -114,13 +114,13 @@ const i18n = {
     },
 
     en: {
-      appName: 'Servetim',
+      appName: 'VarlıkDefteri',
       save: 'Save', cancel: 'Cancel', delete: 'Delete', edit: 'Edit',
       add: 'Add', close: 'Close', next: 'Next', back: 'Back', confirm: 'Confirm',
       yes: 'Yes', no: 'No',
 
       welcome: 'Welcome 👋',
-      welcomeDesc: 'Track all your assets in one place with Servetim. Simple, secure, and all yours.',
+      welcomeDesc: 'Track all your assets in one place with VarlıkDefteri. Simple, secure, and all yours.',
       selectLanguage: 'Select Language',
       selectCurrency: 'Base Currency',
       currencyDesc: 'Which currency do you prefer to see primarily?',

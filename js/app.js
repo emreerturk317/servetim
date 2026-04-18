@@ -546,7 +546,7 @@ function tryShowReminderNotification() {
   if (lastNotifDay === todayKey) return;
   localStorage.setItem('srv_last_notif_day', todayKey);
 
-  new Notification('Servetim 📊', {
+  new Notification('VarlıkDefteri 📊', {
     body: 'Varlıklarını güncelleme zamanı! Bu ayın kaydını almayı unutma.',
     icon: '/servetim/icons/icon-192.png',
     badge: '/servetim/icons/icon-192.png',

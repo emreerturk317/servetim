@@ -1,6 +1,6 @@
 {
-  "name": "Servetim",
-  "short_name": "Servetim",
+  "name": "VarlıkDefteri",
+  "short_name": "VarlıkDefteri",
   "description": "Kişisel birikim takip uygulaması",
   "id": "/servetim/",
   "start_url": "./index.html",
