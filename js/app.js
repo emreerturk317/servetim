@@ -365,7 +365,7 @@ function renderAssetList(assets, history) {
   const prevMap = {};
   if (prevSnap) prevSnap.forEach(a => prevMap[a.id] = a);
 
-  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
+  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠', stock: '📈' };
   container.innerHTML = assets.map(asset => {
     const tryVal = toTRY(asset.amount, asset.currency, frozenRate);
     const usdVal = toUSD(asset.amount, asset.currency, frozenRate);
@@ -600,7 +600,7 @@ function openUpdateModal(monthKey) {
   const isPastEdit = monthKey && monthKey !== currentMonthKey;
   _editingMonthKey = isPastEdit ? monthKey : null;
 
-  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
+  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠', stock: '📈' };
   const modal = document.getElementById('modal-update');
   const body = document.getElementById('update-list');
 
@@ -870,8 +870,8 @@ function renderHistory() {
 
   const currentMonthKey = Storage.currentMonthKey();
   const monthsFull = i18n.t('monthsFull');
-  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property') };
-  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠' };
+  const catNames = { bank: i18n.t('bank'), gold: i18n.t('gold'), crypto: i18n.t('crypto'), property: i18n.t('property'), stock: i18n.t('stock') };
+  const emojis = { bank: '🏦', gold: '🥇', crypto: '₿', property: '🏠', stock: '📈' };
 
   function fullMonthLabel(mk) {
     const [y, m] = mk.split('-');
