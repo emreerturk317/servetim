@@ -150,9 +150,15 @@ function setupBack() {
 }
 
 async function setupFinishWithNotif(allow) {
-  if (allow && 'Notification' in window) {
-    const perm = await Notification.requestPermission();
-    setupNotifEnabled = perm === 'granted';
+  if (allow) {
+    const LN = window.Capacitor?.Plugins?.LocalNotifications;
+    if (LN) {
+      const result = await LN.requestPermissions();
+      setupNotifEnabled = result.display === 'granted';
+    } else if ('Notification' in window) {
+      const perm = await Notification.requestPermission();
+      setupNotifEnabled = perm === 'granted';
+    }
   } else {
     setupNotifEnabled = false;
   }
@@ -566,9 +572,8 @@ async function scheduleMotivationalNotification() {
       if (result.display !== 'granted') return;
     }
 
-    // Zaten zamanlanmışsa tekrar ekleme
-    const { notifications: pending } = await LN.getPending();
-    if (pending.some(n => n.id === 1001)) return;
+    // Mevcut bildirimi iptal et, yeniden planla (uygulama açılınca 3 günlük sayaç sıfırlanır)
+    await LN.cancel({ notifications: [{ id: 1001 }] });
 
     // Rastgele söz seç
     const lang = settings.language || 'tr';
