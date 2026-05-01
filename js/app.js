@@ -589,7 +589,7 @@ async function scheduleMotivationalNotification() {
         body: `"${q.text[lang]}" — ${q.author}`,
         schedule: { at: fireAt, repeats: true },
         sound: null,
-        smallIcon: 'ic_stat_icon_config_sample',
+        smallIcon: 'ic_notification',
         iconColor: '#2d6a4f',
       }]
     });
