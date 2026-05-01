@@ -582,13 +582,13 @@ async function scheduleMotivationalNotification() {
         id: 1001,
         title: 'VarlıkDefteri 💡',
         body: `"${q.text[lang]}" — ${q.author}`,
-        schedule: { at: fireAt },
+        schedule: { at: fireAt, repeats: true },
         sound: null,
         smallIcon: 'ic_stat_icon_config_sample',
         iconColor: '#2d6a4f',
       }]
     });
-  } catch (e) {}
+  } catch (e) { console.warn('Bildirim planlama hatası:', e); }
 }
 
 let _editingMonthKey = null; // null = current month, string = past month key
