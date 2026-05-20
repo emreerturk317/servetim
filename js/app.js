@@ -86,7 +86,7 @@ async function init() {
     hideSetup();
     renderApp();
     checkMonthlyUpdatePrompt();
-    tryShowReminderNotification();
+    scheduleMonthlyReminder();
     scheduleMotivationalNotification();
   }
 
@@ -534,26 +534,51 @@ function checkMonthlyUpdatePrompt() {
   document.getElementById('header-update-btn').classList.add('hidden');
 }
 
-function tryShowReminderNotification() {
+async function scheduleMonthlyReminder() {
+  // Yalnızca Capacitor native ortamında çalışır (APK)
+  const LN = window.Capacitor?.Plugins?.LocalNotifications;
+  if (!LN) return;
+
   const settings = Storage.getSettings();
   if (!settings.notificationsEnabled) return;
-  if (Notification.permission !== 'granted') return;
-  if (Storage.hasCurrentMonthEntry()) return;
-  if (!Storage.getAssets().length) return;
-  const now = new Date();
-  if (now.getDate() < settings.reminderDay) return;
 
-  // Only show once per day
-  const lastNotifDay = localStorage.getItem('srv_last_notif_day');
-  const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-  if (lastNotifDay === todayKey) return;
-  localStorage.setItem('srv_last_notif_day', todayKey);
+  try {
+    const { display } = await LN.checkPermissions();
+    if (display !== 'granted') {
+      const result = await LN.requestPermissions();
+      if (result.display !== 'granted') return;
+    }
 
-  new Notification('VarlıkDefteri 📊', {
-    body: 'Varlıklarını güncelleme zamanı! Bu ayın kaydını almayı unutma.',
-    icon: '/servetim/icons/icon-192.png',
-    badge: '/servetim/icons/icon-192.png',
-  });
+    // Mevcut aylık hatırlatmayı iptal et
+    await LN.cancel({ notifications: [{ id: 1002 }] });
+
+    // Varlık yoksa hatırlatma gerekmez
+    if (!Storage.getAssets().length) return;
+
+    // Bir sonraki hatırlatma tarihini hesapla
+    const now = new Date();
+    const reminderDay = settings.reminderDay || 1;
+
+    // Bu ayın hatırlatma günü, saat 10:00
+    let target = new Date(now.getFullYear(), now.getMonth(), reminderDay, 10, 0, 0);
+
+    // Eğer bu ayın günü geçtiyse veya bu ay zaten güncellendiyse → gelecek aya planla
+    if (target <= now || Storage.hasCurrentMonthEntry()) {
+      target.setMonth(target.getMonth() + 1);
+    }
+
+    await LN.schedule({
+      notifications: [{
+        id: 1002,
+        title: 'VarlıkDefteri 📊',
+        body: 'Varlıklarını güncelleme zamanı! Bu ayın kaydını almayı unutma.',
+        schedule: { at: target },
+        sound: null,
+        smallIcon: 'ic_notification',
+        iconColor: '#2d6a4f',
+      }]
+    });
+  } catch (e) { console.warn('Aylık hatırlatma planlama hatası:', e); }
 }
 
 async function scheduleMotivationalNotification() {
@@ -752,6 +777,7 @@ function saveUpdate() {
   checkGamification();
   closeUpdateModal();
   checkMonthlyUpdatePrompt();
+  scheduleMonthlyReminder();
   renderDashboard();
   showToast(i18n.t('updateSaved'));
 }
@@ -1226,6 +1252,8 @@ function saveSettingsPage() {
     applyI18nToApp();
   }
   renderDashboard();
+  scheduleMonthlyReminder();
+  scheduleMotivationalNotification();
   showToast('✓ Ayarlar kaydedildi');
 }
 
@@ -1303,20 +1331,6 @@ function showToast(msg) {
   toastTimer = setTimeout(() => el.classList.add('hidden'), 2800);
 }
 
-// ─── Notifications ────────────────────────────────────
-function scheduleNotification() {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const settings = Storage.getSettings();
-  const now = new Date();
-  const target = new Date(now.getFullYear(), now.getMonth(), settings.reminderDay, 9, 0, 0);
-  if (target <= now) target.setMonth(target.getMonth() + 1);
-  const delay = target - now;
-  setTimeout(() => {
-    if (!Storage.hasCurrentMonthEntry()) {
-      new Notification(i18n.t('appName'), { body: i18n.t('updateReminder'), icon: './icons/icon-192.png' });
-    }
-  }, delay);
-}
 
 // ─── Utilities ────────────────────────────────────────
 function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
